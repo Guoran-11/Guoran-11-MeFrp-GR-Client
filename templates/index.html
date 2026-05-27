@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ME Frp Web 管理面板</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --bg-color: #f8fafc;
+            --sidebar-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --hover-color: #f1f5f9;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --sidebar-bg: #1e293b;
+            --card-bg: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --hover-color: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding: 1.5rem 0;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-logo {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar-logo span {
+            color: var(--secondary-color);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .sidebar-menu a:hover {
+            background-color: var(--hover-color);
+            color: var(--text-primary);
+        }
+
+        .sidebar-menu a.active {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+
+        .sidebar-menu a i {
+            width: 20px;
+            font-size: 1rem;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 1rem 0;
+        }
+
+        .sidebar-submenu {
+            list-style: none;
+            padding-left: 2.5rem;
+        }
+
+        .sidebar-submenu a {
+            padding-left: 1.5rem;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        /* 顶部导航栏 */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--hover-color);
+            color: var(--text-primary);
+        }
+
+        /* 卡片样式 */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* 统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .stat-card h6 {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-value.success {
+            color: #10b981;
+        }
+
+        .stat-value.warning {
+            color: #f59e0b;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: var(--hover-color);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+        }
+
+        .btn-outline {
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--hover-color);
+            color: var(--text-primary);
+        }
+
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+
+        /* 输入框组 */
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .input-group .form-control {
+            flex: 1;
+        }
+
+        /* 登录模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 450px;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        .login-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .login-tab {
+            padding: 0.5rem 1rem;
+            background: none;
+            border: none;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .login-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        /* 结果区域 */
+        .result-area {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 150px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+            color: var(--text-secondary);
+            overflow-x: auto;
+        }
+
+        /* 通知消息 */
+        .notification {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .notification.success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .notification.error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .notification.info {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        /* 响应式表格容器 */
+        .table-responsive {
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--bg-secondary);
+        }
+
+        /* 表格样式 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        }
+
+        .data-table td {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: var(--hover-color);
+        }
+
+        .data-table tbody tr:first-child:hover td {
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+
+        .data-table tbody tr:last-child:hover td {
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        /* 状态徽章 */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-badge.online {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .status-badge.offline {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .status-badge.pending {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                min-height: auto;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .top-bar {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-network-wired"></i>
+                <span>ME</span>Frp
+            </div>
+        </div>
+        
+        <ul class="sidebar-menu" id="sidebarMenu">
+            <li><a href="#" class="active" data-section="dashboard"><i class="fas fa-home"></i> 控制面板</a></li>
+            <li><a href="#" data-section="tunnels"><i class="fas fa-route"></i> 隧道管理</a></li>
+            <li><a href="#" data-section="nodes"><i class="fas fa-server"></i> 节点监控</a></li>
+            <li><a href="#" data-section="download"><i class="fas fa-download"></i> 文件下载</a></li>
+            <li><a href="#" data-section="help"><i class="fas fa-question-circle"></i> 帮助中心</a></li>
+            <li><a href="#" data-section="user"><i class="fas fa-user"></i> 用户中心</a></li>
+            <li><a href="#" data-section="about"><i class="fas fa-info-circle"></i> 关于面板</a></li>
+            
+            <div class="sidebar-divider"></div>
+            
+            <li>
+                <a href="#" data-section="more"><i class="fas fa-lightbulb"></i> 更多服务</a>
+                <ul class="sidebar-submenu">
+                    <li><a href="#" data-section="orders"><i class="fas fa-receipt"></i> 我的订单</a></li>
+                    <li><a href="#" data-section="vip"><i class="fas fa-crown"></i> 增值服务</a></li>
+                    <li><a href="#" data-section="ads"><i class="fas fa-ad"></i> 广告投放</a></li>
+                    <li><a href="#" data-section="donate"><i class="fas fa-coffee"></i> 节点捐赠</a></li>
+                    <li><a href="#" data-section="draw"><i class="fas fa-gift"></i> 权益抽取</a></li>
+                    <li><a href="#" data-section="domain"><i class="fas fa-cloud"></i> 域名管理</a></li>
+                </ul>
+            </li>
+            
+            <div class="sidebar-divider"></div>
+            
+            <li><a href="#" id="logoutBtn" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> 退出登录</a></li>
+        </ul>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <!-- 顶部导航栏 -->
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <h1 class="card-title" id="pageTitle">控制面板</h1>
+            </div>
+            <div class="top-bar-right">
+                <span id="userGreeting" style="display: none;">欢迎回来，<span id="usernameDisplay"></span></span>
+                <button class="btn btn-outline" id="loginBtn" style="display: none;">登录</button>
+                <button class="theme-toggle" id="themeToggle" title="切换主题">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 登录模态框 -->
+        <div class="modal" id="loginModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">用户登录</h2>
+                    <button class="modal-close" id="closeModal"><i class="fas fa-times"></i></button>
+                </div>
+                
+                <div class="login-tabs">
+                    <button class="login-tab active" id="passwordTab">密码登录</button>
+                    <button class="login-tab" id="tokenTab">Token 登录</button>
+                </div>
+                
+                <!-- 密码登录表单 -->
+                <form id="passwordLoginForm">
+                    <div class="form-group">
+                        <label>邮箱</label>
+                        <input type="email" class="form-control" id="loginEmail" placeholder="请输入邮箱">
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" class="form-control" id="loginPassword" placeholder="请输入密码">
+                    </div>
+                    <div class="form-group">
+                        <label>验证码</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="loginCaptcha" placeholder="请输入验证码">
+                            <button type="button" class="btn btn-secondary" id="getLoginCaptcha">获取验证码</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">登录</button>
+                </form>
+                
+                <!-- Token 登录表单 -->
+                <form id="tokenLoginForm" style="display: none;">
+                    <div class="form-group">
+                        <label>访问 Token</label>
+                        <input type="password" class="form-control" id="loginToken" placeholder="请输入访问 Token（不显示）">
+                        <small style="color: var(--text-secondary); font-size: 0.8rem;">Token 不会显示，输入后直接登录</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Token 登录</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 仪表盘区域 -->
+        <section id="dashboardSection">
+            <!-- 统计卡片 -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h6><i class="fas fa-coins"></i> 剩余流量</h6>
+                    <div class="stat-value" id="trafficValue">--</div>
+                </div>
+                <div class="stat-card">
+                    <h6><i class="fas fa-route"></i> 隧道数量</h6>
+                    <div class="stat-value" id="tunnelCount">--</div>
+                </div>
+                <div class="stat-card">
+                    <h6><i class="fas fa-calendar-check"></i> 今日签到</h6>
+                    <div class="stat-value" id="signStatus">--</div>
+                </div>
+                <div class="stat-card">
+                    <h6><i class="fas fa-users"></i> 用户组</h6>
+                    <div class="stat-value" id="userGroup">--</div>
+                </div>
+            </div>
+
+            <!-- 快捷操作 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">快捷操作</span>
+                </div>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button class="btn btn-primary" id="getInfoBtn">
+                        <i class="fas fa-user"></i> 获取用户信息
+                    </button>
+                    <button class="btn btn-secondary" id="signBtn">
+                        <i class="fas fa-calendar-check"></i> 签到
+                    </button>
+                    <button class="btn btn-secondary" id="refreshTokenBtn">
+                        <i class="fas fa-sync-alt"></i> 刷新 Token
+                    </button>
+                    <button class="btn btn-outline" id="listTunnelsBtn">
+                        <i class="fas fa-list"></i> 列出隧道
+                    </button>
+                    <button class="btn btn-outline" id="listNodesBtn">
+                        <i class="fas fa-server"></i> 列出节点
+                    </button>
+                </div>
+            </div>
+
+            <!-- 签到区域 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">签到</span>
+                </div>
+                <div class="form-group">
+                    <label>验证码</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="signCaptcha" placeholder="请手动输入验证码">
+                        <button type="button" class="btn btn-secondary" id="openCaptchaBtn">打开验证码</button>
+                    </div>
+                    <small style="color: var(--text-secondary); font-size: 0.8rem;">点击"打开验证码"按钮完成人机验证，然后将验证码粘贴到输入框中</small>
+                </div>
+                <button class="btn btn-primary" id="doSignBtn">确认签到</button>
+            </div>
+
+            <!-- 系统公告 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📢 系统公告</span>
+                    <span class="badge badge-danger">最新</span>
+                </div>
+                <div class="card-body" id="announcementArea" style="max-height: 600px; overflow-y: auto; padding: 1rem;">
+                    <style>
+                        .announcement-content {
+                            font-size: 0.95rem;
+                            line-height: 1.8;
+                            color: var(--text-primary);
+                        }
+                        .announcement-content h4 {
+                            color: #667eea;
+                            margin-top: 1.5rem;
+                            margin-bottom: 0.5rem;
+                            padding-bottom: 0.3rem;
+                            border-bottom: 1px solid #e2e8f0;
+                        }
+                        .announcement-content h4:first-child {
+                            margin-top: 0;
+                        }
+                        .announcement-content .important {
+                            background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+                            color: white;
+                            border-left: none;
+                            padding: 1rem 1.5rem;
+                            margin: 1rem -1rem;
+                            border-radius: 8px;
+                            font-weight: bold;
+                            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+                        }
+                        .announcement-content .important h4 {
+                            color: white;
+                            border-bottom: 2px solid rgba(255,255,255,0.3);
+                            margin-top: 0;
+                            padding-bottom: 0.5rem;
+                        }
+                        .announcement-content p {
+                            margin-bottom: 0.8rem;
+                            text-indent: 2em;
+                        }
+                        .announcement-content ul {
+                            margin-left: 1.5rem;
+                            margin-bottom: 0.8rem;
+                        }
+                        .announcement-content li {
+                            margin-bottom: 0.3rem;
+                        }
+                        .announcement-content .warning {
+                            background: #fff3cd;
+                            border-left: 4px solid #ffc107;
+                            padding: 0.5rem 1rem;
+                            margin: 0.8rem 0;
+                            border-radius: 0 4px 4px 0;
+                        }
+                        .announcement-content .danger {
+                            background: #f8d7da;
+                            border-left: 4px solid #dc3545;
+                            padding: 0.5rem 1rem;
+                            margin: 0.8rem 0;
+                            border-radius: 0 4px 4px 0;
+                        }
+                        .announcement-content .info {
+                            background: #d1ecf1;
+                            border-left: 4px solid #17a2b8;
+                            padding: 0.5rem 1rem;
+                            margin: 0.8rem 0;
+                            border-radius: 0 4px 4px 0;
+                        }
+                        .announcement-content a {
+                            color: #667eea;
+                            text-decoration: none;
+                            word-break: break-all;
+                        }
+                        .announcement-content a:hover {
+                            text-decoration: underline;
+                        }
+                    </style>
+                    <div class="announcement-content">
+                        <!-- 重要公告 -->
+                        <div class="important">
+                            <h4>🚨 重要公告</h4>
+                            <p>新建隧道时，欢迎打开 <strong>地图模式</strong> 进行尝鲜，这是我们推出的重磅功能之一！欢迎体验并留下反馈。</p>
+                            
+                            <div style="background: rgba(255,255,255,0.2); padding: 0.8rem; border-radius: 6px; margin-top: 0.8rem;">
+                                <strong>⚠️ 宁波节点下线通知：</strong><br>
+                                接宁波机房通知：根据浙江宁波地区监管要求，个人用户不得开展具有上下行流量 1:1 特征的流量转发类业务，包括但不限于FRP、组网、隧道、内网穿透、端口转发等程序。<br>
+                                <strong style="color: #ffd700;">我们将下线所有宁波节点，感谢您的理解。</strong>
+                            </div>
+                        </div>
+                        
+                        <h4>💡 常见问题</h4>
+                        <p>您通常可以在 <strong>常见问题大全</strong> 处找到答案，如果您的问题十分刁钻，请附带完整上下文和日志联系管理员寻求帮助。</p>
+                        
+                        <div class="warning">
+                            <strong>❓ 我可以 TCP 建站吗？</strong><br>
+                            中国大陆节点禁止 TCP 建站，如您已经使用 TCP 穿透诸如 NAS 等内容，请在限期内尽快整改。中国大陆节点建站（使用 80/443 端口）需要已过白的备案域名，您可在「个人中心」提交备案过白，未备案的域名将禁止创建隧道和访问。其他地区节点不受影响，即可 TCP 建站的同时也不需要提交白名单。
+                        </div>
+                        
+                        <div class="info">
+                            <strong>🐛 在 WebUI 里点击「下线」后 UI 显示错误</strong><br>
+                            这是一个已知问题，问题在于 LxHTT 编写的代码并没有完整覆盖每一种下线 cases，我们将在六月发布的版本中修复该问题。<br>
+                            您可以在「节点监控」处查看节点的版本信息，如果版本过低，您可以在群聊内提醒捐赠者升级或联系管理员清退该节点（不推荐）。
+                        </div>
+                        
+                        <div class="danger">
+                            <strong>🚫 我一直启动不了啊，能不能退款啊？</strong><br>
+                            不能，虚拟商品不支持退款，且创建隧道并不需要花任何一分钱。若你投诉我们的支付接口，我们会把你的账户封禁处理，并同步到内网穿透联盟黑名单。<br><br>
+                            遇到这种情况请你带着完整日志寻求管理或者交流群内群友的帮助，而不是发表诸如"有人吗""有大佬能帮我吗""怎么办怎么办"的言论，否则建议你立刻前往医院神经内科挂号问诊，或者把小学道法课本拿起来多翻翻。
+                        </div>
+                        
+                        <h4>⚠️ 安全预警</h4>
+                        <p>近期，我们监测到有未知实体正在持续对 ME Frp 穿透节点发起有组织性的大规模恶意扫描。为保障您的资产安全及业务稳定运行，请务必对通过穿透暴露的服务采取必要的安全防护措施。</p>
+                        
+                        <div class="warning">
+                            <strong>Minecraft 服务防护建议：</strong><br>
+                            • 启用正版验证<br>
+                            • 安装登录验证插件<br>
+                            • 启用玩家白名单机制<br>
+                            • 不联机时关闭隧道
+                        </div>
+                        
+                        <div class="warning">
+                            <strong>SSH/RDP 服务防护建议：</strong><br>
+                            • 不远程时关闭隧道<br>
+                            • 使用 32 位以上混合高强度密码（SSH 使用密钥）<br>
+                            • 及时安装系统补丁
+                        </div>
+                        
+                        <h4>🔒 封禁公告</h4>
+                        <p><strong>用户 lanjing6123（188*****6#qq.com）封号：</strong>恶意投诉 ME Frp 支付接口，在购买后 20 分钟内发起投诉，造假"交易被骗"情形。经调查，该用户未进行任何隧道启动操作，实名认证已通过，不存在无法使用情形。已封禁并拉入联合黑名单。</p>
+                        
+                        <p><strong>用户 PvZ12（2186*****1#qq.com）封号：</strong>恶意投诉 ME Frp 支付接口，在购买后 1 小时内发起投诉，无实质性退款理由。已封禁。</p>
+                        
+                        <div class="danger">
+                            <strong>重要提醒：</strong>虚拟产品购买后默认不支持退款，请确认后再进行支付。若恶意退款/投诉，将直接封禁账户。
+                        </div>
+                        
+                        <h4>🎁 限时活动</h4>
+                        <p>正式用户带宽提升至 50Mbps，VIP 带宽提升至 130Mbps，限时双倍带宽！</p>
+                        
+                        <h4>🔗 公告链接</h4>
+                        <p>幻缘映射封禁大屏（公开版）：<a href="https://acmecloud.feishu.cn/share/base/dashboard/shrcnKAKrTdPGtytCpVUv3bLPlc" target="_blank">点击查看</a></p>
+                        
+                        <h4>🤖 官方机器人上线</h4>
+                        <p>QQ 群机器人和飞书群机器人均已全量上线！发送 /mefrp 获取详情。绑定账户时请使用私聊。</p>
+                        
+                        <h4>⚠️ 严打通知</h4>
+                        <p>严禁使用幻缘映射穿透 Silly Tavern、Stable Diffusion、ComfyUI 等项目。此类项目被大量用于色情内容传播，一经发现立即封禁隧道，无申诉机会。</p>
+                        
+                        <h4>📝 免责声明</h4>
+                        <p>禁止穿透盗版影视资源网站、发卡网、网赚平台、色情内容、IDC 业务系统等。我们将上线内容检测系统，请用户自查整改。</p>
+                        
+                        <h4>🔐 安全提醒</h4>
+                        <p>若穿透 MCSM、Lucky、DDNS、堡塔、1Panel 等管理面板，请务必使用安全系数高的密码！</p>
+                        
+                        <h4>💡 温馨提示</h4>
+                        <ul>
+                            <li>隧道名称请不要包含中文、空格、标点符号，否则会导致隧道无法启动</li>
+                            <li>在用户中心实名认证后才可以使用完整功能</li>
+                            <li>根据相关规定，中国大陆内节点服务不对未实名认证用户开放</li>
+                        </ul>
+                        
+                        <h4>📧 客户支持</h4>
+                        <p>遇到问题可通过以下方式寻求帮助：</p>
+                        <ul>
+                            <li>QQ 一群（推荐）</li>
+                            <li>QQ 二群</li>
+                            <li>飞书群</li>
+                            <li>邮件：support@mefrp.com（低速）</li>
+                        </ul>
+                        <p>封禁申诉问卷：<a href="https://acmecloud.feishu.cn/share/base/form/shrcn4bqX3nFLF42aFGQME7fVub" target="_blank">点击填写</a></p>
+                        
+                        <h4>⚠️ 文件捆绑警告</h4>
+                        <p>近期蓝奏云存在引流捆绑情况。使用备用链接下载时，请勿选择普通下载，选择电信或联通下载！</p>
+                        
+                        <h4>📢 AFF 推广活动</h4>
+                        <p>发布 ME Frp 教程、体验或对比内容，每 50 播放/浏览量兑 40GB 流量，每 200 播放/浏览量兑一个月 VIP！发布后向官方邮箱提交链接即可。</p>
+                        
+                        <h4>📦 FRPC 更新</h4>
+                        <p>春季创意者更新后，旧版 MEFRPC 快捷启动功能失效，请前往文件下载获取新版本。FRP 核心已放弃支持 Windows 7 及以下用户。</p>
+                        
+                        <h4>🔍 内容分发限制</h4>
+                        <p>禁止使用 ME Frp 穿透服务提供文件下载、视频流等内容分发服务（带宽容量 &lt; 60Mbps 的节点）。</p>
+                        
+                        <h4>❤️ 感谢支持</h4>
+                        <p>感谢一路以来默默支持我们的用户！赞助者专属群：721388053</p>
+                        
+                        <div class="info">
+                            <strong>提问请带眼睛，没带导致的问题一律不予解答。</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 隧道管理区域 -->
+        <section id="tunnelsSection" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">隧道列表</span>
+                    <button class="btn btn-primary" id="refreshTunnelsBtn">
+                        <i class="fas fa-sync-alt"></i> 刷新列表
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table" id="tunnelsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>名称</th>
+                                <th>类型</th>
+                                <th>节点</th>
+                                <th>本地地址</th>
+                                <th>远程端口</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tunnelsTableBody">
+                            <tr>
+                                <td colspan="8" style="text-align: center; color: var(--text-secondary);">
+                                    点击"刷新列表"按钮加载隧道数据
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 创建隧道表单 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">创建新隧道</span>
+                    <button class="btn btn-secondary" id="loadCreateDataBtn">
+                        <i class="fas fa-download"></i> 加载节点数据
+                    </button>
+                </div>
+                <form id="createTunnelForm">
+                    <div class="form-group" style="margin-bottom: 0.8rem;">
+                        <label style="margin-bottom: 0.3rem;">选择节点</label>
+                        <select class="form-control" id="createNodeSelect" required style="height: auto; padding: 0.5rem;">
+                            <option value="">-- 请先加载节点数据 --</option>
+                        </select>
+                        <button type="button" class="btn btn-sm btn-secondary" id="loadCreateDataBtn" style="margin-top: 0.5rem; width: 100%;">
+                            <i class="fas fa-database"></i> 加载节点数据
+                        </button>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0.8rem;">
+                        <label style="margin-bottom: 0.3rem;">隧道名称</label>
+                        <input type="text" class="form-control" id="createProxyName" placeholder="例如: my-tunnel" required style="height: auto; padding: 0.5rem;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0.8rem;">
+                        <label style="margin-bottom: 0.3rem;">隧道类型</label>
+                        <select class="form-control" id="createProxyType" required style="height: auto; padding: 0.5rem;">
+                            <option value="tcp">TCP</option>
+                            <option value="udp">UDP</option>
+                            <option value="http">HTTP</option>
+                            <option value="https">HTTPS</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0.8rem;">
+                        <label style="margin-bottom: 0.3rem;">本地 IP</label>
+                        <input type="text" class="form-control" id="createLocalIp" placeholder="例如: 127.0.0.1" value="127.0.0.1" required style="height: auto; padding: 0.5rem;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0.8rem;">
+                        <label style="margin-bottom: 0.3rem;">本地端口</label>
+                        <input type="number" class="form-control" id="createLocalPort" placeholder="例如: 8080" required style="height: auto; padding: 0.5rem;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0.8rem;">
+                        <label style="margin-bottom: 0.3rem;">远程端口</label>
+                        <input type="number" class="form-control" id="createRemotePort" placeholder="例如: 12345" style="height: auto; padding: 0.5rem;">
+                        <small style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.2rem; display: block;">留空将自动分配端口</small>
+                    </div>
+                    
+                    <!-- HTTP/HTTPS 额外选项 -->
+                    <div id="httpOptions" style="display: none;">
+                        <div class="form-group" style="margin-bottom: 0.8rem;">
+                            <label style="margin-bottom: 0.3rem;">子域名（可选）</label>
+                            <input type="text" class="form-control" id="createDomain" placeholder="例如: myapp" style="height: auto; padding: 0.5rem;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0.8rem;">
+                            <label style="margin-bottom: 0.3rem;">HTTP 插件</label>
+                            <select class="form-control" id="createHttpPlugin" style="height: auto; padding: 0.5rem;">
+                                <option value="">无</option>
+                                <option value="http2https">http2https</option>
+                                <option value="https2http">https2http</option>
+                                <option value="https2https">https2https</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0.8rem;">
+                            <label style="margin-bottom: 0.3rem;">访问密码（可选）</label>
+                            <input type="password" class="form-control" id="createHttpUser" placeholder="访问用户名" style="height: auto; padding: 0.5rem; margin-bottom: 0.3rem;">
+                            <input type="password" class="form-control" id="createHttpPassword" placeholder="访问密码" style="height: auto; padding: 0.5rem;">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 0.8rem;">
+                        <label style="display: flex; align-items: center; margin-bottom: 0;">
+                            <input type="checkbox" id="createUseEncryption" style="margin-right: 0.5rem;"> 启用加密
+                        </label>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label style="display: flex; align-items: center; margin-bottom: 0;">
+                            <input type="checkbox" id="createUseCompression" style="margin-right: 0.5rem;"> 启用压缩
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> 创建隧道
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <section id="nodesSection" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">可用节点</span>
+                    <button class="btn btn-secondary" id="refreshNodesBtn">
+                        <i class="fas fa-sync-alt"></i> 刷新节点
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table" id="nodesTable">
+                        <thead>
+                            <tr>
+                                <th>节点ID</th>
+                                <th>名称</th>
+                                <th>地区</th>
+                                <th>带宽</th>
+                                <th>允许端口</th>
+                                <th>允许类型</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="nodesTableBody">
+                            <tr>
+                                <td colspan="7" style="text-align: center; color: var(--text-secondary);">
+                                    点击"刷新节点"按钮加载节点数据
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="downloadSection" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">文件下载</span>
+                </div>
+                <p>文件下载功能开发中...</p>
+            </div>
+        </section>
+
+        <section id="helpSection" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">帮助中心</span>
+                </div>
+                <p>帮助中心功能开发中...</p>
+            </div>
+        </section>
+
+        <section id="userSection" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">用户中心</span>
+                </div>
+                <p>用户中心功能开发中...</p>
+            </div>
+        </section>
+
+        <section id="aboutSection" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">关于面板</span>
+                </div>
+                <p>ME Frp Web 管理面板 v1.0.0</p>
+            </div>
+        </section>
+
+        <section id="ordersSection" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">我的订单</span>
+                </div>
+                <p>订单功能开发中...</p>
+            </div>
+        </section>
+
+        <section id="vipSection" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">增值服务</span>
+                </div>
+                <p>增值服务功能开发中...</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // 主题切换
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('mefrp-theme', theme);
+            themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+        
+        const savedTheme = localStorage.getItem('mefrp-theme') || 'light';
+        setTheme(savedTheme);
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        });
+
+        // 侧边栏导航
+        const sidebarLinks = document.querySelectorAll('.sidebar-menu a');
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = link.getAttribute('data-section');
+                if (section) {
+                    // 切换激活状态
+                    sidebarLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                    
+                    // 显示对应区域
+                    document.querySelectorAll('section').forEach(s => s.style.display = 'none');
+                    document.getElementById(`${section}Section`).style.display = 'block';
+                    
+                    // 更新标题
+                    document.getElementById('pageTitle').textContent = link.textContent.trim();
+                }
+            });
+        });
+
+        // 登录状态管理
+        function checkLoginStatus() {
+            fetch('/api/user_info')
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.error) {
+                        showLoggedIn(data);
+                    } else {
+                        showLoggedOut();
+                    }
+                })
+                .catch(() => showLoggedOut());
+        }
+
+        function showLoggedIn(userData) {
+            document.getElementById('userGreeting').style.display = 'inline';
+            document.getElementById('usernameDisplay').textContent = userData.username || userData.userId;
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'block';
+            updateUserStats(userData);
+            
+            // 登录成功后启动自动刷新
+            sessionStorage.setItem('loggedIn', 'true');
+            startAutoRefresh();
+        }
+
+        function showLoggedOut() {
+            document.getElementById('userGreeting').style.display = 'none';
+            document.getElementById('loginBtn').style.display = 'inline';
+            document.getElementById('logoutBtn').style.display = 'block';
+            document.getElementById('trafficValue').textContent = '--';
+            document.getElementById('tunnelCount').textContent = '--';
+            document.getElementById('signStatus').textContent = '--';
+            document.getElementById('userGroup').textContent = '--';
+            
+            // 退出登录后停止自动刷新
+            sessionStorage.removeItem('loggedIn');
+            stopAutoRefresh();
+        }
+
+        // 更新用户统计
+        function updateUserStats(data) {
+            if (data.traffic !== undefined) {
+                document.getElementById('trafficValue').textContent = formatTraffic(data.traffic);
+            }
+            if (data.tunnelCount !== undefined) {
+                document.getElementById('tunnelCount').textContent = data.tunnelCount;
+            }
+            if (data.signedToday !== undefined) {
+                document.getElementById('signStatus').textContent = data.signedToday ? '已签到' : '未签到';
+                document.getElementById('signStatus').className = 'stat-value' + (data.signedToday ? ' success' : ' warning');
+            }
+            if (data.userGroup !== undefined) {
+                document.getElementById('userGroup').textContent = data.userGroup;
+            }
+        }
+
+        // 流量格式化（MEFrp API 返回的是 MB 单位）
+        function formatTraffic(mb) {
+            if (mb === undefined || mb === null) return '--';
+            const units = ['MB', 'GB', 'TB', 'PB'];
+            let size = parseFloat(mb);
+            let unitIndex = 0;
+            while (size >= 1024 && unitIndex < units.length - 1) {
+                size /= 1024;
+                unitIndex++;
+            }
+            return `${size.toFixed(2)} ${units[unitIndex]}`;
+        }
+
+        // 模态框操作
+        const loginModal = document.getElementById('loginModal');
+        const loginBtn = document.getElementById('loginBtn');
+        const closeModal = document.getElementById('closeModal');
+
+        loginBtn.addEventListener('click', () => loginModal.classList.add('active'));
+        closeModal.addEventListener('click', () => loginModal.classList.remove('active'));
+
+        // 登录方式切换
+        const passwordTab = document.getElementById('passwordTab');
+        const tokenTab = document.getElementById('tokenTab');
+        const passwordForm = document.getElementById('passwordLoginForm');
+        const tokenForm = document.getElementById('tokenLoginForm');
+
+        passwordTab.addEventListener('click', () => {
+            passwordTab.classList.add('active');
+            tokenTab.classList.remove('active');
+            passwordForm.style.display = 'block';
+            tokenForm.style.display = 'none';
+        });
+
+        tokenTab.addEventListener('click', () => {
+            tokenTab.classList.add('active');
+            passwordTab.classList.remove('active');
+            tokenForm.style.display = 'block';
+            passwordForm.style.display = 'none';
+        });
+
+        // 密码登录
+        passwordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const captcha = document.getElementById('loginCaptcha').value;
+            
+            if (!email || !password) {
+                alert('请填写邮箱和密码');
+                return;
+            }
+
+            const result = await apiCall('POST', '/api/login', {
+                email,
+                password,
+                captcha_token: captcha || 'test'
+            });
+            
+            if (result && !result.error) {
+                loginModal.classList.remove('active');
+                checkLoginStatus();
+                showNotification('登录成功！', 'success');
+            }
+        });
+
+        // Token 登录
+        tokenForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = document.getElementById('loginToken').value;
+            
+            if (!token) {
+                alert('请输入 Token');
+                return;
+            }
+
+            const result = await apiCall('POST', '/api/token_login', { token });
+            
+            if (result && !result.error) {
+                loginModal.classList.remove('active');
+                document.getElementById('loginToken').value = ''; // 清空 Token
+                checkLoginStatus();
+                showNotification('Token 登录成功！', 'success');
+            }
+        });
+
+        // 获取登录验证码
+        document.getElementById('getLoginCaptcha').addEventListener('click', () => {
+            window.open(
+                'https://www.mefrp.com/3rdparty/captcha?client=CODENAME',
+                'captcha',
+                'width=400,height=500'
+            );
+            showNotification('请在弹出窗口中完成验证码验证，然后手动复制验证码到输入框', 'info');
+        });
+
+        // 退出登录
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await apiCall('POST', '/api/logout');
+            showLoggedOut();
+            showNotification('已退出登录', 'info');
+        });
+
+        // API 调用封装（显示在结果区域）
+        async function apiCall(method, url, body = null) {
+            const options = {
+                method: method,
+                headers: { 'Content-Type': 'application/json' }
+            };
+            if (body) options.body = JSON.stringify(body);
+            
+            try {
+                const resp = await fetch(url, options);
+                
+                if (!resp.ok) {
+                    const errorText = await resp.text();
+                    const errorData = {
+                        error: `HTTP ${resp.status}: ${errorText}`
+                    };
+                    return errorData;
+                }
+                
+                const data = await resp.json();
+                return data;
+            } catch (err) {
+                const errorData = { error: `请求失败: ${err.message}` };
+                return errorData;
+            }
+        }
+        
+        // 后台 API 调用（不显示在结果区域）
+        async function apiCallSilent(method, url, body = null) {
+            const options = {
+                method: method,
+                headers: { 'Content-Type': 'application/json' }
+            };
+            if (body) options.body = JSON.stringify(body);
+            
+            try {
+                const resp = await fetch(url, options);
+                const data = await resp.json();
+                return data;
+            } catch (err) {
+                console.error('后台请求失败:', err);
+                return { error: err.message };
+            }
+        }
+
+        // 快捷操作按钮
+        document.getElementById('getInfoBtn').addEventListener('click', () => {
+            apiCallSilent('GET', '/api/user_info').then(data => {
+                if (!data.error) {
+                    updateUserStats(data);
+                    showNotification('用户信息已更新', 'success');
+                } else {
+                    showNotification('获取用户信息失败：' + data.error, 'error');
+                }
+            });
+        });
+
+        document.getElementById('signBtn').addEventListener('click', () => {
+            showNotification('请在下方签到区域填写验证码后再签到', 'info');
+        });
+
+        document.getElementById('refreshTokenBtn').addEventListener('click', () => {
+            apiCall('POST', '/api/refresh_token');
+        });
+
+        document.getElementById('listTunnelsBtn').addEventListener('click', () => {
+            apiCallSilent('GET', '/api/tunnels').then(data => {
+                if (data && !data.error && data.proxies) {
+                    renderTunnelsTable(data.proxies, data.nodes);
+                    showNotification(`已加载 ${data.proxies.length} 个隧道`, 'success');
+                } else {
+                    showNotification('获取隧道列表失败', 'error');
+                }
+            });
+        });
+
+        document.getElementById('listNodesBtn').addEventListener('click', () => {
+            apiCallSilent('GET', '/api/nodes').then(data => {
+                if (data && !data.error && data.nodes) {
+                    renderNodesTable(data.nodes);
+                    showNotification(`已加载 ${data.nodes.length} 个节点`, 'success');
+                } else {
+                    showNotification('获取节点列表失败', 'error');
+                }
+            });
+        });
+
+        // 签到功能
+        document.getElementById('openCaptchaBtn').addEventListener('click', () => {
+            window.open(
+                'https://www.mefrp.com/3rdparty/captcha?client=CODENAME',
+                'captcha',
+                'width=400,height=500'
+            );
+            showNotification('请在弹出窗口中完成验证码验证，然后手动复制验证码到输入框', 'info');
+        });
+
+        document.getElementById('doSignBtn').addEventListener('click', async () => {
+            const captcha = document.getElementById('signCaptcha').value.trim();
+            
+            if (!captcha) {
+                showNotification('请先获取验证码并填写', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById('doSignBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 签到中...';
+            btn.disabled = true;
+            
+            // 使用后台静默调用
+            const result = await apiCallSilent('POST', '/api/sign', { captcha_token: captcha });
+            
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            
+            if (result && !result.error) {
+                showNotification('签到成功！', 'success');
+                document.getElementById('signCaptcha').value = '';
+                // 刷新用户信息
+                apiCallSilent('GET', '/api/user_info').then(data => updateUserStats(data));
+            } else if (result && result.need_captcha) {
+                showNotification('需要验证码：' + result.message, 'warning');
+            } else {
+                showNotification('签到失败：' + (result?.error || '未知错误'), 'error');
+            }
+        });
+
+        // 通知提示
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i> ${message}`;
+            document.querySelector('.main-content').prepend(notification);
+            
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        // 刷新隧道列表（后台静默获取）
+        document.getElementById('refreshTunnelsBtn').addEventListener('click', () => {
+            const btn = document.getElementById('refreshTunnelsBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 加载中...';
+            btn.disabled = true;
+            
+            // 使用后台静默调用
+            apiCallSilent('GET', '/api/tunnels').then(data => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                
+                if (data && !data.error) {
+                    if (data.proxies && Array.isArray(data.proxies)) {
+                        renderTunnelsTable(data.proxies, data.nodes);
+                        // 静默模式，不显示通知
+                    } else {
+                        console.warn('隧道数据格式错误');
+                    }
+                } else if (data && data.error) {
+                    console.warn('加载失败：' + data.error);
+                }
+            }).catch(err => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                console.error('加载失败：' + err.message);
+            });
+        });
+
+        // 自动刷新隧道列表功能
+        let tunnelRefreshInterval = null;
+        const TUNNEL_REFRESH_INTERVAL = 30000; // 30秒刷新一次
+
+        function startAutoRefresh() {
+            // 如果已经在运行，先停止
+            if (tunnelRefreshInterval) {
+                clearInterval(tunnelRefreshInterval);
+            }
+            
+            // 立即刷新一次
+            document.getElementById('refreshTunnelsBtn').click();
+            
+            // 设置定时器，每30秒自动刷新
+            tunnelRefreshInterval = setInterval(() => {
+                // 检查用户是否已登录
+                if (sessionStorage.getItem('loggedIn') === 'true') {
+                    document.getElementById('refreshTunnelsBtn').click();
+                }
+            }, TUNNEL_REFRESH_INTERVAL);
+            
+            console.log('隧道列表自动刷新已启动（每30秒）');
+        }
+
+        function stopAutoRefresh() {
+            if (tunnelRefreshInterval) {
+                clearInterval(tunnelRefreshInterval);
+                tunnelRefreshInterval = null;
+                console.log('隧道列表自动刷新已停止');
+            }
+        }
+
+        // 页面加载时启动自动刷新（如果已登录）
+        if (sessionStorage.getItem('loggedIn') === 'true') {
+            setTimeout(() => {
+                startAutoRefresh();
+            }, 1000); // 延迟1秒启动，确保页面已完全加载
+        }
+        
+        // 加载节点数据（用于创建隧道，后台静默获取）
+        document.getElementById('loadCreateDataBtn').addEventListener('click', () => {
+            const btn = document.getElementById('loadCreateDataBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 加载中...';
+            btn.disabled = true;
+            
+            apiCallSilent('GET', '/api/create_proxy_data').then(data => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                
+                if (data && !data.error && data.nodes) {
+                    renderNodeSelect(data.nodes);
+                    showNotification('节点数据加载成功', 'success');
+                } else {
+                    showNotification('节点数据加载失败：' + (data?.error || '未知错误'), 'error');
+                }
+            }).catch(err => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                showNotification('加载失败：' + err.message, 'error');
+            });
+        });
+        
+        // 刷新节点列表（后台静默获取）
+        document.getElementById('refreshNodesBtn').addEventListener('click', () => {
+            const btn = document.getElementById('refreshNodesBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 加载中...';
+            btn.disabled = true;
+            
+            apiCallSilent('GET', '/api/nodes').then(data => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                
+                if (data && !data.error && data.nodes) {
+                    renderNodesTable(data.nodes);
+                    showNotification(`成功加载 ${data.nodes.length} 个节点`, 'success');
+                } else {
+                    showNotification('节点列表加载失败：' + (data?.error || '未知错误'), 'error');
+                }
+            }).catch(err => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                showNotification('加载失败：' + err.message, 'error');
+            });
+        });
+
+        // 渲染隧道列表
+        function renderTunnelsTable(proxies, nodes) {
+            const tbody = document.getElementById('tunnelsTableBody');
+            
+            console.log('渲染隧道列表 - 数据：', { proxies, nodes });
+            
+            if (!proxies || proxies.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-secondary);">暂无隧道</td></tr>';
+                return;
+            }
+
+            const nodeMap = {};
+            if (nodes) {
+                if (Array.isArray(nodes)) {
+                    nodes.forEach(node => {
+                        if (node && node.nodeId) {
+                            nodeMap[node.nodeId] = node.name || `节点 ${node.nodeId}`;
+                        }
+                    });
+                }
+            }
+            
+            console.log('节点映射表：', nodeMap);
+
+            const html = proxies.map((proxy, index) => {
+                if (!proxy || typeof proxy !== 'object') {
+                    console.warn('无效的隧道数据：', proxy);
+                    return '';
+                }
+                
+                const proxyType = proxy.proxyType || 'tcp';
+                const isOnline = proxy.isOnline || false;
+                const isDisabled = proxy.isDisabled || false;
+                const nodeName = nodeMap[proxy.nodeId] || `节点 ${proxy.nodeId}`;
+                
+                return `
+                    <tr data-proxy-id="${proxy.proxyId}">
+                        <td>${proxy.proxyId || '-'}</td>
+                        <td>${proxy.proxyName || '-'}</td>
+                        <td><span class="status-badge ${proxyType.toLowerCase()}">${proxyType.toUpperCase()}</span></td>
+                        <td>${nodeName}</td>
+                        <td>${proxy.localIp || '127.0.0.1'}:${proxy.localPort || '-'}</td>
+                        <td>${proxy.remotePort || '-'}</td>
+                        <td>
+                            <span class="status-badge ${isOnline ? 'online' : 'offline'}">
+                                ${isOnline ? '在线' : '离线'}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="toggleTunnel(${proxy.proxyId})" title="${isDisabled ? '启用' : '禁用'}">
+                                <i class="fas fa-${isDisabled ? 'play' : 'pause'}"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteTunnel(${proxy.proxyId})" title="删除">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            tbody.innerHTML = html;
+            console.log(`渲染了 ${proxies.length} 个隧道`);
+        }
+
+        // 渲染节点选择下拉框
+        function renderNodeSelect(nodes) {
+            const select = document.getElementById('createNodeSelect');
+            select.innerHTML = '<option value="">-- 请选择节点 --</option>';
+            
+            nodes.forEach(node => {
+                const disabled = node.isDisabled ? '（已禁用）' : '';
+                const online = node.isOnline ? '🟢' : '🔴';
+                select.innerHTML += `<option value="${node.nodeId}">${online} ${node.name} ${disabled}</option>`;
+            });
+        }
+
+        // 渲染节点列表
+        function renderNodesTable(nodes) {
+            const tbody = document.getElementById('nodesTableBody');
+            if (!nodes || nodes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-secondary);">暂无节点数据</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = nodes.map(node => `
+                <tr>
+                    <td>${node.nodeId}</td>
+                    <td>${node.name}</td>
+                    <td>${node.region || '-'}</td>
+                    <td>${node.bandwidth || '-'}</td>
+                    <td>${node.allowPort || '-'}</td>
+                    <td>${node.allowType || '-'}</td>
+                    <td>
+                        <span class="status-badge ${node.isOnline ? 'online' : 'offline'}">
+                            ${node.isOnline ? '在线' : '离线'}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 切换隧道状态
+        window.toggleTunnel = function(proxyId) {
+            if (confirm('确定要切换此隧道状态吗？')) {
+                apiCall('POST', '/api/close_tunnel', { id: proxyId }).then(data => {
+                    if (!data.error) {
+                        showNotification('隧道状态切换成功', 'success');
+                        document.getElementById('refreshTunnelsBtn').click();
+                    }
+                });
+            }
+        };
+
+        // 删除隧道
+        window.deleteTunnel = function(proxyId) {
+            if (confirm('确定要删除此隧道吗？此操作不可恢复！')) {
+                apiCall('POST', '/api/delete_tunnel', { id: proxyId }).then(data => {
+                    if (!data.error) {
+                        showNotification('隧道删除成功', 'success');
+                        document.getElementById('refreshTunnelsBtn').click();
+                    }
+                });
+            }
+        };
+
+        // 创建隧道表单提交
+        document.getElementById('createTunnelForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const nodeId = document.getElementById('createNodeSelect').value;
+            const proxyName = document.getElementById('createProxyName').value;
+            const proxyType = document.getElementById('createProxyType').value;
+            const localIp = document.getElementById('createLocalIp').value;
+            const localPort = document.getElementById('createLocalPort').value;
+            const remotePort = document.getElementById('createRemotePort').value;
+            
+            if (!nodeId || !proxyName || !localIp || !localPort) {
+                alert('请填写所有必填字段');
+                return;
+            }
+
+            const tunnelData = {
+                node_id: parseInt(nodeId),
+                name: proxyName,  // 后端会映射到 proxyName
+                proxy_type: proxyType,
+                local_ip: localIp,
+                local_port: parseInt(localPort),
+                remote_port: remotePort ? parseInt(remotePort) : undefined,
+                domain: document.getElementById('createDomain').value || '',
+                http_plugin: document.getElementById('createHttpPlugin').value || '',
+                http_user: document.getElementById('createHttpUser').value || '',
+                http_password: document.getElementById('createHttpPassword').value || '',
+                use_encryption: document.getElementById('createUseEncryption').checked,
+                use_compression: document.getElementById('createUseCompression').checked
+            };
+            
+            console.log('创建隧道数据：', tunnelData);
+
+            const btn = e.target.closest('form').querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 创建中...';
+            btn.disabled = true;
+            
+            // 使用后台静默调用
+            const result = await apiCallSilent('POST', '/api/create_tunnel', tunnelData);
+            
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            
+            if (result && !result.error) {
+                showNotification('隧道创建成功！', 'success');
+                // 清空表单
+                document.getElementById('createTunnelForm').reset();
+                document.getElementById('createLocalIp').value = '127.0.0.1';
+                document.getElementById('httpOptions').style.display = 'none';
+                
+                // 检查是否自动启用
+                if (result.enabled) {
+                    showNotification('隧道已自动启用！', 'success');
+                }
+                
+                // 刷新隧道列表
+                setTimeout(() => {
+                    document.getElementById('refreshTunnelsBtn').click();
+                }, 500);
+            } else {
+                showNotification('创建失败：' + (result?.error || '未知错误'), 'error');
+            }
+        });
+
+        // 根据隧道类型显示/隐藏 HTTP 选项
+        document.getElementById('createProxyType').addEventListener('change', (e) => {
+            const httpOptions = document.getElementById('httpOptions');
+            if (e.target.value === 'http' || e.target.value === 'https') {
+                httpOptions.style.display = 'block';
+            } else {
+                httpOptions.style.display = 'none';
+            }
+        });
+
+        // 页面加载时检查登录状态
+        checkLoginStatus();
+    </script>
+</body>
+</html>
