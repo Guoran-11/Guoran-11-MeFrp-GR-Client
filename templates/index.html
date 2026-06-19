@@ -3,31 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ME Frp Web 管理面板</title>
+    <title>MeFrp-GR-Client</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --sidebar-width: 250px;
-            --primary-color: #667eea;
-            --secondary-color: #764ba2;
-            --bg-color: #f8fafc;
-            --sidebar-bg: #ffffff;
+            --sidebar-width: 260px;
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --bg-color: #f0f2f8;
+            --sidebar-bg: rgba(15, 17, 29, 0.97);
             --card-bg: #ffffff;
-            --text-primary: #1e293b;
+            --text-primary: #0f172a;
             --text-secondary: #64748b;
             --border-color: #e2e8f0;
             --hover-color: #f1f5f9;
+            --glow-primary: rgba(99, 102, 241, 0.35);
+            --glow-cyan: rgba(6, 182, 212, 0.3);
         }
 
         [data-theme="dark"] {
-            --bg-color: #0f172a;
-            --sidebar-bg: #1e293b;
-            --card-bg: #1e293b;
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --border-color: #334155;
-            --hover-color: #334155;
+            --bg-color: #070b14;
+            --sidebar-bg: rgba(10, 13, 25, 0.98);
+            --card-bg: rgba(18, 22, 38, 0.85);
+            --text-primary: #e8ecf4;
+            --text-secondary: #8892a8;
+            --border-color: rgba(99, 102, 241, 0.12);
+            --hover-color: rgba(99, 102, 241, 0.08);
+            --glow-primary: rgba(99, 102, 241, 0.5);
+            --glow-cyan: rgba(6, 182, 212, 0.4);
         }
 
         * {
@@ -37,42 +43,88 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-primary);
             min-height: 100vh;
-            transition: background-color 0.3s, color 0.3s;
+            transition: background-color 0.4s ease, color 0.4s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 科技感网格背景 */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        [data-theme="dark"] body::before {
+            background-image:
+                linear-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
         }
 
         /* 侧边栏样式 */
         .sidebar {
             width: var(--sidebar-width);
-            background-color: var(--sidebar-bg);
-            border-right: 1px solid var(--border-color);
+            background: linear-gradient(180deg, rgba(10, 13, 28, 0.97) 0%, rgba(15, 18, 35, 0.97) 100%);
+            border-right: 1px solid rgba(99, 102, 241, 0.1);
             min-height: 100vh;
             position: fixed;
             left: 0;
             top: 0;
             padding: 1.5rem 0;
-            transition: background-color 0.3s, border-color 0.3s;
+            transition: background-color 0.4s, border-color 0.4s;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(180deg, transparent, var(--glow-primary), transparent);
+            opacity: 0.5;
         }
 
         .sidebar-header {
             padding: 0 1.5rem;
-            margin-bottom: 2rem;
+            margin-bottom: 2.2rem;
         }
 
         .sidebar-logo {
             font-weight: 700;
-            font-size: 1.5rem;
-            color: var(--primary-color);
+            font-size: 1.4rem;
+            color: #fff;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.6rem;
+            letter-spacing: -0.02em;
+        }
+
+        .sidebar-logo i {
+            width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 15px var(--glow-primary);
         }
 
         .sidebar-logo span {
-            color: var(--secondary-color);
+            background: linear-gradient(135deg, #a5b4fc, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .sidebar-menu {
@@ -82,28 +134,52 @@
         }
 
         .sidebar-menu li {
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.2rem;
         }
 
         .sidebar-menu a {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            padding: 0.75rem 1.5rem;
-            color: var(--text-secondary);
+            padding: 0.72rem 1.5rem;
+            color: rgba(148, 163, 184, 0.85);
             text-decoration: none;
-            transition: all 0.2s;
-            font-size: 0.9rem;
+            transition: all 0.25s ease;
+            font-size: 0.89rem;
+            font-weight: 450;
+            border-radius: 0;
+            position: relative;
+        }
+
+        .sidebar-menu a::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 0;
+            background: linear-gradient(180deg, var(--primary-color), var(--accent-cyan));
+            border-radius: 0 3px 3px 0;
+            transition: height 0.2s ease;
         }
 
         .sidebar-menu a:hover {
-            background-color: var(--hover-color);
-            color: var(--text-primary);
+            background-color: rgba(99, 102, 241, 0.08);
+            color: #e2e8f0;
+        }
+
+        .sidebar-menu a:hover::before {
+            height: 20px;
         }
 
         .sidebar-menu a.active {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+            color: #fff;
+            box-shadow: inset 0 0 30px rgba(99, 102, 241, 0.06);
+        }
+
+        .sidebar-menu a.active::before {
+            height: 28px;
         }
 
         .sidebar-menu a i {
@@ -132,7 +208,9 @@
         .main-content {
             margin-left: var(--sidebar-width);
             min-height: 100vh;
-            padding: 1.5rem;
+            padding: 1.8rem 2rem;
+            position: relative;
+            z-index: 1;
         }
 
         /* 顶部导航栏 */
@@ -141,28 +219,30 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
+            padding: 0.2rem;
         }
 
-        .top-bar-left {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+        .top-bar-left h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.03em;
         }
 
         .top-bar-right {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.8rem;
         }
 
         .theme-toggle {
             background: none;
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 0.5rem;
+            border-radius: 10px;
+            padding: 0.55rem;
             cursor: pointer;
             color: var(--text-secondary);
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
 
         .theme-toggle:hover {
@@ -174,25 +254,52 @@
         .card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1.5rem;
+            border-radius: 16px;
+            padding: 1.5rem 1.75rem;
             margin-bottom: 1.5rem;
-            transition: background-color 0.3s, border-color 0.3s;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(99,102,241,0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+            border-color: rgba(99, 102, 241, 0.15);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        [data-theme="dark"] .card:hover {
+            box-shadow: 0 8px 32px rgba(0,0,0,0.25), 0 0 0 1px rgba(99,102,241,0.08);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--border-color);
         }
 
         .card-title {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 600;
             color: var(--text-primary);
+            letter-spacing: 0.01em;
         }
 
         /* 统计卡片 */
@@ -204,26 +311,59 @@
         }
 
         .stat-card {
-            background-color: var(--card-bg);
+            background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1.25rem;
+            border-radius: 16px;
+            padding: 1.4rem 1.5rem;
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
-            transition: background-color 0.3s, border-color 0.3s;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: -50%; right: -50%;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle, var(--glow-primary) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(99,102,241,0.1);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .stat-card:hover::after {
+            opacity: 0.15;
+        }
+
+        [data-theme="dark"] .stat-card:hover {
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 30px rgba(99,102,241,0.06);
         }
 
         .stat-card h6 {
-            font-size: 0.85rem;
+            font-size: 0.78rem;
             color: var(--text-secondary);
             font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            position: relative;
+            z-index: 1;
         }
 
         .stat-value {
-            font-size: 1.5rem;
+            font-size: 1.7rem;
             font-weight: 700;
             color: var(--text-primary);
+            line-height: 1.2;
+            position: relative;
+            z-index: 1;
         }
 
         .stat-value.success {
@@ -236,35 +376,46 @@
 
         /* 按钮样式 */
         .btn {
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
             font-weight: 500;
             border: none;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.25s ease;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            font-size: 0.9rem;
+            font-size: 0.87rem;
+            letter-spacing: 0.01em;
+            position: relative;
+            overflow: hidden;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             color: white;
+            box-shadow: 0 2px 12px var(--glow-primary);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 24px rgba(99,102,241,0.45);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px var(--glow-primary);
         }
 
         .btn-secondary {
-            background-color: var(--hover-color);
+            background: rgba(99, 102, 241, 0.08);
             color: var(--text-primary);
+            border: 1px solid rgba(99, 102, 241, 0.1);
         }
 
         .btn-secondary:hover {
-            background-color: var(--border-color);
+            background: rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.2);
         }
 
         .btn-outline {
@@ -274,8 +425,9 @@
         }
 
         .btn-outline:hover {
-            background-color: var(--hover-color);
+            background: rgba(99, 102, 241, 0.06);
             color: var(--text-primary);
+            border-color: rgba(99, 102, 241, 0.2);
         }
 
         .btn-danger {
@@ -287,27 +439,37 @@
             background-color: #dc2626;
         }
 
+        .btn-info {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #2563eb;
+        }
+
         /* 表单样式 */
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.1rem;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.45rem;
             font-weight: 500;
             color: var(--text-primary);
+            font-size: 0.88rem;
         }
 
         .form-control {
             width: 100%;
-            padding: 0.5rem 1rem;
+            padding: 0.6rem 1rem;
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 10px;
             background-color: var(--bg-color);
             color: var(--text-primary);
             font-size: 0.9rem;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
 
         .form-control:focus {
@@ -424,27 +586,38 @@
 
         /* 通知消息 */
         .notification {
-            padding: 1rem;
-            border-radius: 8px;
+            padding: 0.9rem 1.2rem;
+            border-radius: 12px;
             margin-bottom: 1rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.6rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .notification.success {
-            background-color: rgba(16, 185, 129, 0.1);
+            background-color: rgba(16, 185, 129, 0.12);
             color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
         }
 
         .notification.error {
-            background-color: rgba(239, 68, 68, 0.1);
+            background-color: rgba(239, 68, 68, 0.12);
             color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
         .notification.info {
-            background-color: rgba(59, 130, 246, 0.1);
+            background-color: rgba(59, 130, 246, 0.12);
             color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.2);
         }
 
         /* 响应式表格容器 */
@@ -457,12 +630,16 @@
         /* 表格样式 */
         .data-table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
         }
 
         .data-table th,
         .data-table td {
-            padding: 0.75rem;
+            padding: 0.8rem 0.9rem;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
         }
@@ -470,13 +647,15 @@
         .data-table th {
             font-weight: 600;
             color: var(--text-secondary);
-            font-size: 0.85rem;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            font-size: 0.82rem;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.06));
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
 
         .data-table td {
             color: var(--text-primary);
-            font-size: 0.9rem;
+            font-size: 0.88rem;
         }
 
         .data-table tbody tr:last-child td {
@@ -550,10 +729,275 @@
                 align-items: flex-start;
             }
         }
+
+        /* 抽奖动画 */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 rgba(102,126,234,0); }
+            50% { box-shadow: 0 0 20px rgba(102,126,234,0.3); }
+        }
+
+        /* 按钮悬停优化 */
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102,126,234,0.35);
+        }
+
+        .btn-warning:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(245,158,11,0.35);
+        }
+
+        .btn-outline:hover {
+            transform: translateY(-1px);
+        }
+
+        /* 卡片悬停微动效 */
+        .card {
+            transition: box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        /* 通知动画 */
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notification {
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+
+        /* ========== 登录页面样式 ========== */
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        @keyframes scanLine {
+            0% { top: -2px; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .login-method-btn {
+            display: flex; align-items: center; gap: 0.8rem;
+            width: 100%; padding: 0.85rem 1.1rem;
+            background: rgba(99,102,241,0.05);
+            border: 1px solid rgba(99,102,241,0.08);
+            border-radius: 11px; color: #cbd5e1;
+            font-size: 0.9rem; font-weight: 500;
+            cursor: pointer; transition: all 0.25s ease;
+            text-align: left;
+        }
+        .login-method-btn:hover {
+            background: rgba(99,102,241,0.12);
+            border-color: rgba(99,102,241,0.25);
+            transform: translateX(4px);
+            color: #e2e8f0;
+        }
+        .login-method-btn i { font-size: 1.15rem; width: 24px; text-align: center; }
+        .login-method-btn span { flex: 1; }
+
+        .back-to-methods {
+            background: none; border: none; color: #64748b;
+            font-size: 0.85rem; cursor: pointer; padding: 0.25rem 0;
+            margin-bottom: 0.5rem; transition: all 0.2s;
+        }
+        .back-to-methods:hover { color: #a5b4fc; }
+
+        .login-input-group { margin-bottom:1rem; }
+        .login-input-group label {
+            display: block; color: #94a3b8; font-size: 0.78rem;
+            font-weight: 500; margin-bottom: 0.35rem;
+            text-transform: uppercase; letter-spacing: 0.04em;
+        }
+        .login-input {
+            width: 100%; padding: 0.7rem 0.9rem;
+            background: rgba(10,14,28,0.7);
+            border: 1px solid rgba(99,102,241,0.12);
+            border-radius: 10px; color: #e2e8f0;
+            font-size: 0.88rem; outline: none;
+            transition: all 0.25s ease;
+        }
+        .login-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.15), 0 0 20px rgba(99,102,241,0.06);
+        }
+        .login-input::placeholder { color: #475569; }
+
+        .btn-captcha {
+            padding: 0.7rem 0.9rem; white-space: nowrap;
+            background: rgba(99,102,241,0.1);
+            border: 1px solid rgba(99,102,241,0.2);
+            border-radius: 10px; color: #a5b4fc;
+            font-size: 0.82rem; cursor: pointer;
+            transition: all 0.25s ease; flex-shrink: 0;
+        }
+        .btn-captcha:hover { background: rgba(99,102,241,0.18); border-color: rgba(99,102,241,0.35); }
+
+        .btn-login-submit {
+            width: 100%; padding: 0.8rem;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border: none; border-radius: 10px;
+            color: #fff; font-size: 0.9rem; font-weight: 600;
+            cursor: pointer; margin-top: 0.4rem;
+            transition: all 0.25s ease; letter-spacing: 0.06em;
+            box-shadow: 0 4px 15px rgba(99,102,241,0.3);
+        }
+        .btn-login-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(99,102,241,0.45);
+        }
+        .btn-login-submit:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        .btn-login-submit:disabled {
+            opacity: 0.55; cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
-    <!-- 侧边栏 -->
+
+    <!-- ========== 独立登录页面 ========== -->
+    <div id="loginPage" style="display:flex; position:fixed; inset:0; z-index:9999; background:linear-gradient(135deg,#06080f 0%,#0c1022 30%,#0a0f1e 70%,#050810 100%); overflow:hidden; align-items:center; justify-content:center;">
+        <!-- 科技感背景 -->
+        <div style="position:absolute; inset:0; overflow:hidden;">
+            <!-- 网格线 -->
+            <div style="position:absolute; inset:0; background-image: linear-gradient(rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.04) 1px, transparent 1px); background-size:50px 50px;"></div>
+            <!-- 光晕效果 -->
+            <div style="position:absolute; width:700px; height:700px; border-radius:50%; background:radial-gradient(circle,rgba(99,102,241,0.07),transparent 65%); top:-250px; right:-150px; animation:pulseGlow 8s ease-in-out infinite;"></div>
+            <div style="position:absolute; width:500px; height:500px; border-radius:50%; background:radial-gradient(circle,rgba(6,182,212,0.05),transparent 65%); bottom:-150px; left:-100px; animation:pulseGlow 10s ease-in-out infinite 2s;"></div>
+            <div style="position:absolute; width:300px; height:300px; border-radius:50%; background:radial-gradient(circle,rgba(139,92,246,0.04),transparent 65%); top:45%; left:5%; animation:pulseGlow 12s ease-in-out infinite 4s;"></div>
+            <!-- 扫描线 -->
+            <div style="position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,rgba(99,102,241,0.3),transparent); animation:scanLine 4s ease-in-out infinite;"></div>
+        </div>
+
+        <div style="width:100%; max-width:400px; margin:auto; padding:1.5rem; position:relative; z-index:1;">
+            <div id="loginCard" style="background:rgba(12, 16, 32, 0.92); backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px); border:1px solid rgba(99,102,241,0.12); border-radius:20px; padding:2.5rem 2rem; box-shadow:0 25px 80px rgba(0,0,0,0.5), 0 0 60px rgba(99,102,241,0.06); position:relative;">
+
+                <!-- 顶部光效 -->
+                <div style="position:absolute; top:0; left:20%; right:20%; height:1px; background:linear-gradient(90deg,transparent,var(--primary-color),transparent);"></div>
+
+                <!-- Logo -->
+                <div style="text-align:center; margin-bottom:1.5rem;">
+                    <div style="width:60px; height:60px; margin:0 auto 1rem; background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.15)); border-radius:16px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(99,102,241,0.2); box-shadow:0 4px 20px rgba(99,102,241,0.15);">
+                        <i class="fas fa-rocket" style="font-size:1.4rem; color:#a5b4fc;"></i>
+                    </div>
+                    <h1 style="font-size:1.5rem; font-weight:700; color:#f1f5f9; margin-bottom:0.35rem; letter-spacing:-0.02em;">ME Frp</h1>
+                    <p style="color:#64748b; font-size:0.85rem; margin:0;">选择方式进入控制台</p>
+                </div>
+
+                <!-- 登录方式选择 -->
+                <div id="loginMethodSelect" style="display:flex; flex-direction:column; gap:0.65rem;">
+                    <button class="login-method-btn" data-method="password" onclick="showLoginForm('password')">
+                        <i class="fas fa-key" style="color:#667eea;"></i>
+                        <span>密码登录</span>
+                    </button>
+                    <button class="login-method-btn" data-method="token" onclick="showLoginForm('token')">
+                        <i class="fas fa-shield-alt" style="color:#06b6d4;"></i>
+                        <span>Token 登录</span>
+                    </button>
+                    <button class="login-method-btn" data-method="passkey" onclick="showLoginForm('passkey')">
+                        <i class="fas fa-fingerprint" style="color:#f59e0b;"></i>
+                        <span>通用密钥登录</span>
+                    </button>
+                </div>
+
+                <!-- 密码登录表单 -->
+                <form id="loginFormPassword" style="display:none;" onsubmit="return handlePasswordLogin(event)">
+                    <button type="button" class="back-to-methods" onclick="backToMethods()">
+                        <i class="fas fa-arrow-left"></i> 返回
+                    </button>
+                    <h3 style="color:#f1f5f9; font-size:1.1rem; font-weight:600; margin:1rem 0 1.2rem;"><i class="fas fa-key" style="color:#667eea; margin-right:0.5rem;"></i>密码登录</h3>
+                    <div class="login-input-group">
+                        <label>邮箱</label>
+                        <input type="email" class="login-input" id="lpEmail" placeholder="请输入邮箱" required autocomplete="email">
+                    </div>
+                    <div class="login-input-group">
+                        <label>密码</label>
+                        <input type="password" class="login-input" id="lpPassword" placeholder="请输入密码" required autocomplete="current-password">
+                    </div>
+                    <div class="login-input-group">
+                        <label>人机验证</label>
+                        <div style="display:flex; gap:0.5rem;">
+                            <input type="text" class="login-input" id="lpCaptcha" placeholder="点击右侧获取验证码" autocomplete="off">
+                            <button type="button" class="btn-captcha" onclick="openCaptchaForLogin()">获取</button>
+                        </div>
+                        <small style="color:#64748b; font-size:0.72rem; margin-top:0.25rem; display:block;">点击获取 → 完成滑块 → 自动解码填入 captchaToken</small>
+                    </div>
+                    <button type="submit" class="btn-login-submit" id="lpSubmitBtn">
+                        <span>登 录</span>
+                    </button>
+                </form>
+
+                <!-- Token 登录表单 -->
+                <form id="loginFormToken" style="display:none;" onsubmit="return handleTokenLogin(event)">
+                    <button type="button" class="back-to-methods" onclick="backToMethods()">
+                        <i class="fas fa-arrow-left"></i> 返回
+                    </button>
+                    <h3 style="color:#f1f5f9; font-size:1.1rem; font-weight:600; margin:1rem 0 1.2rem;"><i class="fas fa-shield-alt" style="color:#06b6d4; margin-right:0.5rem;"></i>Token 登录</h3>
+                    <div class="login-input-group">
+                        <label>访问 Token</label>
+                        <input type="password" class="login-input" id="tokenInput" placeholder="输入您的访问令牌" required autocomplete="off">
+                        <small style="color:#64748b; font-size:0.75rem; margin-top:0.3rem; display:block;">从控制台获取的 API Token</small>
+                    </div>
+                    <button type="submit" class="btn-login-submit" id="tokenSubmitBtn">
+                        <i class="fas fa-sign-in-alt"></i> 验证登录
+                    </button>
+                </form>
+
+                <!-- 通用密钥(Token)登录表单 -->
+                <form id="loginFormPasskey" style="display:none;" onsubmit="return handlePasskeyLogin(event)">
+                    <button type="button" class="back-to-methods" onclick="backToMethods()">
+                        <i class="fas fa-arrow-left"></i> 返回
+                    </button>
+                    <h3 style="color:#f1f5f9; font-size:1.1rem; font-weight:600; margin:1rem 0 1.2rem;"><i class="fas fa-fingerprint" style="color:#f59e0b; margin-right:0.5rem;"></i>通用密钥登录</h3>
+                    <div class="login-input-group">
+                        <label>访问 Token</label>
+                        <input type="password" class="login-input" id="pkToken" placeholder="输入您的访问令牌" required autocomplete="off">
+                        <small style="color:#64748b; font-size:0.75rem; margin-top:0.3rem; display:block;">Token 输入后不会明文显示</small>
+                    </div>
+                    <button type="submit" class="btn-login-submit" id="pkSubmitBtn">
+                        <i class="fas fa-fingerprint"></i> 验证并登录
+                    </button>
+                </form>
+
+                <!-- 底部注册 -->
+                <div style="text-align:center; margin-top:1.5rem; padding-top:1.2rem; border-top:1px solid rgba(255,255,255,0.06);">
+                    <span style="color:#64748b; font-size:0.85rem;">还没有账号？</span>
+                    <a href="https://console.mefrp.com/register" target="_blank" style="color:#667eea; text-decoration:none; font-weight:500; margin-left:0.25rem;">立即注册</a>
+                </div>
+
+                <!-- 加载动画 -->
+                <div id="loginLoadingOverlay" style="display:none; position:absolute; inset:0; background:rgba(15,23,42,0.85); border-radius:20px; align-items:center; justify-content:center; z-index:10;">
+                    <div style="text-align:center;">
+                        <div style="width:48px; height:48px; border:3px solid rgba(102,126,234,0.2); border-top-color:#667eea; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 1rem;"></div>
+                        <div style="color:#94a3b8; font-size:0.9rem;" id="loginLoadingText">正在登录...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 应用主体（登录后显示）========== -->
+    <div id="appBody" style="display:none;">
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
@@ -566,24 +1010,8 @@
             <li><a href="#" class="active" data-section="dashboard"><i class="fas fa-home"></i> 控制面板</a></li>
             <li><a href="#" data-section="tunnels"><i class="fas fa-route"></i> 隧道管理</a></li>
             <li><a href="#" data-section="nodes"><i class="fas fa-server"></i> 节点监控</a></li>
-            <li><a href="#" data-section="download"><i class="fas fa-download"></i> 文件下载</a></li>
-            <li><a href="#" data-section="help"><i class="fas fa-question-circle"></i> 帮助中心</a></li>
-            <li><a href="#" data-section="user"><i class="fas fa-user"></i> 用户中心</a></li>
+            <li><a href="#" data-section="lottery"><i class="fas fa-gift"></i> 权益抽奖</a></li>
             <li><a href="#" data-section="about"><i class="fas fa-info-circle"></i> 关于面板</a></li>
-            
-            <div class="sidebar-divider"></div>
-            
-            <li>
-                <a href="#" data-section="more"><i class="fas fa-lightbulb"></i> 更多服务</a>
-                <ul class="sidebar-submenu">
-                    <li><a href="#" data-section="orders"><i class="fas fa-receipt"></i> 我的订单</a></li>
-                    <li><a href="#" data-section="vip"><i class="fas fa-crown"></i> 增值服务</a></li>
-                    <li><a href="#" data-section="ads"><i class="fas fa-ad"></i> 广告投放</a></li>
-                    <li><a href="#" data-section="donate"><i class="fas fa-coffee"></i> 节点捐赠</a></li>
-                    <li><a href="#" data-section="draw"><i class="fas fa-gift"></i> 权益抽取</a></li>
-                    <li><a href="#" data-section="domain"><i class="fas fa-cloud"></i> 域名管理</a></li>
-                </ul>
-            </li>
             
             <div class="sidebar-divider"></div>
             
@@ -607,70 +1035,53 @@
             </div>
         </div>
 
-        <!-- 登录模态框 -->
-        <div class="modal" id="loginModal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title">用户登录</h2>
-                    <button class="modal-close" id="closeModal"><i class="fas fa-times"></i></button>
-                </div>
-                
-                <div class="login-tabs">
-                    <button class="login-tab active" id="passwordTab">密码登录</button>
-                    <button class="login-tab" id="tokenTab">Token 登录</button>
-                </div>
-                
-                <!-- 密码登录表单 -->
-                <form id="passwordLoginForm">
-                    <div class="form-group">
-                        <label>邮箱</label>
-                        <input type="email" class="form-control" id="loginEmail" placeholder="请输入邮箱">
-                    </div>
-                    <div class="form-group">
-                        <label>密码</label>
-                        <input type="password" class="form-control" id="loginPassword" placeholder="请输入密码">
-                    </div>
-                    <div class="form-group">
-                        <label>验证码</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="loginCaptcha" placeholder="请输入验证码">
-                            <button type="button" class="btn btn-secondary" id="getLoginCaptcha">获取验证码</button>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">登录</button>
-                </form>
-                
-                <!-- Token 登录表单 -->
-                <form id="tokenLoginForm" style="display: none;">
-                    <div class="form-group">
-                        <label>访问 Token</label>
-                        <input type="password" class="form-control" id="loginToken" placeholder="请输入访问 Token（不显示）">
-                        <small style="color: var(--text-secondary); font-size: 0.8rem;">Token 不会显示，输入后直接登录</small>
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Token 登录</button>
-                </form>
-            </div>
-        </div>
-
         <!-- 仪表盘区域 -->
         <section id="dashboardSection">
-            <!-- 统计卡片 -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h6><i class="fas fa-coins"></i> 剩余流量</h6>
-                    <div class="stat-value" id="trafficValue">--</div>
+            <!-- 用户信息 + 公告 左右布局 -->
+            <div style="display: flex; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <!-- 左侧：用户信息（纵向分布） -->
+                <div style="flex: 1; min-width: 0;">
+                    <div class="stats-grid" style="grid-template-columns: 1fr;">
+                        <div class="stat-card">
+                            <h6><i class="fas fa-coins"></i> 剩余流量</h6>
+                            <div class="stat-value" id="trafficValue">--</div>
+                        </div>
+                        <div class="stat-card">
+                            <h6><i class="fas fa-route"></i> 隧道数量</h6>
+                            <div class="stat-value" id="tunnelCount">--</div>
+                        </div>
+                        <div class="stat-card">
+                            <h6><i class="fas fa-calendar-check"></i> 今日签到</h6>
+                            <div class="stat-value" id="signStatus">--</div>
+                        </div>
+                        <div class="stat-card">
+                            <h6><i class="fas fa-users"></i> 用户组</h6>
+                            <div class="stat-value" id="userGroup">--</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <h6><i class="fas fa-route"></i> 隧道数量</h6>
-                    <div class="stat-value" id="tunnelCount">--</div>
-                </div>
-                <div class="stat-card">
-                    <h6><i class="fas fa-calendar-check"></i> 今日签到</h6>
-                    <div class="stat-value" id="signStatus">--</div>
-                </div>
-                <div class="stat-card">
-                    <h6><i class="fas fa-users"></i> 用户组</h6>
-                    <div class="stat-value" id="userGroup">--</div>
+                <!-- 右侧：重要公告 -->
+                <div style="width: 420px; flex-shrink: 0;">
+                    <div class="card" style="height: 100%;">
+                        <div class="card-header">
+                            <span class="card-title">📢 重要公告</span>
+                        </div>
+                        <div style="max-height: 400px; overflow-y: auto; padding-right: 0.5rem; font-size: 0.85rem; line-height: 1.6; color: var(--text-secondary);">
+                            <p><strong style="color:#ef4444;">🚨 宁波节点下线通知：</strong>接宁波机房通知，根据浙江宁波地区监管要求，个人用户不得开展具有上下行流量 1:1 特征的流量转发类业务，包括但不限于FRP、组网、隧道、内网穿透、端口转发等程序。我们将下线所有宁波节点。</p>
+                            <hr style="border-color: var(--border-color); margin: 0.5rem 0;">
+                            <p><strong>❓ TCP 建站：</strong>中国大陆节点禁止 TCP 建站。中国大陆节点建站（使用 80/443 端口）需要已过白的备案域名。</p>
+                            <hr style="border-color: var(--border-color); margin: 0.5rem 0;">
+                            <p><strong>⚠️ 安全预警：</strong>近期监测到有组织性的大规模恶意扫描，请务必对穿透服务采取安全防护措施。</p>
+                            <hr style="border-color: var(--border-color); margin: 0.5rem 0;">
+                            <p><strong>🎁 限时活动：</strong>正式用户带宽提升至 50Mbps，VIP 带宽提升至 130Mbps。</p>
+                            <hr style="border-color: var(--border-color); margin: 0.5rem 0;">
+                            <p><strong>🤖 官方机器人：</strong>QQ 群机器人和飞书群机器人已全量上线！发送 <code>/mefrp</code> 获取详情。</p>
+                            <hr style="border-color: var(--border-color); margin: 0.5rem 0;">
+                            <p><strong>📦 FRPC 更新：</strong>春季创意者更新后，旧版 MEFRPC 快捷启动功能失效，请下载新版本。</p>
+                            <hr style="border-color: var(--border-color); margin: 0.5rem 0;">
+                            <p style="font-size:0.8rem; color: var(--text-secondary);">完整公告请访问 <a href="https://www.mefrp.com" target="_blank" style="color: var(--primary-color);">ME Frp 官网</a></p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -689,12 +1100,6 @@
                     <button class="btn btn-secondary" id="refreshTokenBtn">
                         <i class="fas fa-sync-alt"></i> 刷新 Token
                     </button>
-                    <button class="btn btn-outline" id="listTunnelsBtn">
-                        <i class="fas fa-list"></i> 列出隧道
-                    </button>
-                    <button class="btn btn-outline" id="listNodesBtn">
-                        <i class="fas fa-server"></i> 列出节点
-                    </button>
                 </div>
             </div>
 
@@ -706,207 +1111,128 @@
                 <div class="form-group">
                     <label>验证码</label>
                     <div class="input-group">
-                        <input type="text" class="form-control" id="signCaptcha" placeholder="请手动输入验证码">
+                        <input type="text" class="form-control" id="signCaptcha" placeholder="打开验证码后自动填写">
                         <button type="button" class="btn btn-secondary" id="openCaptchaBtn">打开验证码</button>
                     </div>
-                    <small style="color: var(--text-secondary); font-size: 0.8rem;">点击"打开验证码"按钮完成人机验证，然后将验证码粘贴到输入框中</small>
+                    <small style="color: var(--text-secondary); font-size: 0.8rem;">打开验证码 → 完成滑块验证 → 编码字符将自动填入（系统会自动解码），无需手动复制</small>
                 </div>
                 <button class="btn btn-primary" id="doSignBtn">确认签到</button>
             </div>
 
-            <!-- 系统公告 -->
+            <!-- 系统公告（完整版，不含重要公告） -->
             <div class="card">
                 <div class="card-header">
                     <span class="card-title">📢 系统公告</span>
-                    <span class="badge badge-danger">最新</span>
+                    <span class="badge badge-danger" style="font-size:0.7rem;">最新</span>
                 </div>
-                <div class="card-body" id="announcementArea" style="max-height: 600px; overflow-y: auto; padding: 1rem;">
+                <div style="max-height: 600px; overflow-y: auto; padding: 1rem;">
                     <style>
-                        .announcement-content {
-                            font-size: 0.95rem;
-                            line-height: 1.8;
-                            color: var(--text-primary);
-                        }
-                        .announcement-content h4 {
-                            color: #667eea;
-                            margin-top: 1.5rem;
-                            margin-bottom: 0.5rem;
-                            padding-bottom: 0.3rem;
-                            border-bottom: 1px solid #e2e8f0;
-                        }
-                        .announcement-content h4:first-child {
-                            margin-top: 0;
-                        }
-                        .announcement-content .important {
-                            background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
-                            color: white;
-                            border-left: none;
-                            padding: 1rem 1.5rem;
-                            margin: 1rem -1rem;
-                            border-radius: 8px;
-                            font-weight: bold;
-                            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-                        }
-                        .announcement-content .important h4 {
-                            color: white;
-                            border-bottom: 2px solid rgba(255,255,255,0.3);
-                            margin-top: 0;
-                            padding-bottom: 0.5rem;
-                        }
-                        .announcement-content p {
-                            margin-bottom: 0.8rem;
-                            text-indent: 2em;
-                        }
-                        .announcement-content ul {
-                            margin-left: 1.5rem;
-                            margin-bottom: 0.8rem;
-                        }
-                        .announcement-content li {
-                            margin-bottom: 0.3rem;
-                        }
-                        .announcement-content .warning {
-                            background: #fff3cd;
-                            border-left: 4px solid #ffc107;
-                            padding: 0.5rem 1rem;
-                            margin: 0.8rem 0;
-                            border-radius: 0 4px 4px 0;
-                        }
-                        .announcement-content .danger {
-                            background: #f8d7da;
-                            border-left: 4px solid #dc3545;
-                            padding: 0.5rem 1rem;
-                            margin: 0.8rem 0;
-                            border-radius: 0 4px 4px 0;
-                        }
-                        .announcement-content .info {
-                            background: #d1ecf1;
-                            border-left: 4px solid #17a2b8;
-                            padding: 0.5rem 1rem;
-                            margin: 0.8rem 0;
-                            border-radius: 0 4px 4px 0;
-                        }
-                        .announcement-content a {
-                            color: #667eea;
-                            text-decoration: none;
-                            word-break: break-all;
-                        }
-                        .announcement-content a:hover {
-                            text-decoration: underline;
-                        }
+                        .announcement-content { font-size:0.95rem; line-height:1.8; color:var(--text-primary); }
+                        .announcement-content h4 { color:#667eea; margin-top:1.5rem; margin-bottom:0.5rem; padding-bottom:0.3rem; border-bottom:1px solid #e2e8f0; font-size:1rem;}
+                        .announcement-content h4:first-child { margin-top:0; }
+                        .announcement-content p { margin-bottom:0.8rem; text-indent:2em; }
+                        .announcement-content ul { margin-left:1.5rem; margin-bottom:0.8rem; }
+                        .announcement-content li { margin-bottom:0.3rem; }
+                        .announcement-content .warning { background:#fff3cd; border-left:4px solid #ffc107; padding:0.5rem 1rem; margin:0.8rem 0; border-radius:0 4px 4px 0; }
+                        .announcement-content .danger { background:#f8d7da; border-left:4px solid #dc3545; padding:0.5rem 1rem; margin:0.8rem 0; border-radius:0 4px 4px 0; }
+                        .announcement-content .info { background:#d1ecf1; border-left:4px solid #17a2b8; padding:0.5rem 1rem; margin:0.8rem 0; border-radius:0 4px 4px 0; }
+                        .announcement-content a { color:#667eea; text-decoration:none; word-break:break-all; }
+                        .announcement-content a:hover { text-decoration:underline; }
                     </style>
                     <div class="announcement-content">
-                        <!-- 重要公告 -->
-                        <div class="important">
-                            <h4>🚨 重要公告</h4>
-                            <p>新建隧道时，欢迎打开 <strong>地图模式</strong> 进行尝鲜，这是我们推出的重磅功能之一！欢迎体验并留下反馈。</p>
-                            
-                            <div style="background: rgba(255,255,255,0.2); padding: 0.8rem; border-radius: 6px; margin-top: 0.8rem;">
-                                <strong>⚠️ 宁波节点下线通知：</strong><br>
-                                接宁波机房通知：根据浙江宁波地区监管要求，个人用户不得开展具有上下行流量 1:1 特征的流量转发类业务，包括但不限于FRP、组网、隧道、内网穿透、端口转发等程序。<br>
-                                <strong style="color: #ffd700;">我们将下线所有宁波节点，感谢您的理解。</strong>
-                            </div>
-                        </div>
-                        
+
                         <h4>💡 常见问题</h4>
                         <p>您通常可以在 <strong>常见问题大全</strong> 处找到答案，如果您的问题十分刁钻，请附带完整上下文和日志联系管理员寻求帮助。</p>
-                        
+
                         <div class="warning">
                             <strong>❓ 我可以 TCP 建站吗？</strong><br>
-                            中国大陆节点禁止 TCP 建站，如您已经使用 TCP 穿透诸如 NAS 等内容，请在限期内尽快整改。中国大陆节点建站（使用 80/443 端口）需要已过白的备案域名，您可在「个人中心」提交备案过白，未备案的域名将禁止创建隧道和访问。其他地区节点不受影响，即可 TCP 建站的同时也不需要提交白名单。
+                            中国大陆节点禁止 TCP 建站。中国大陆节点建站（使用 80/443 端口）需要已过白的备案域名，您可在「个人中心」提交备案过白，未备案的域名将禁止创建隧道和访问。
                         </div>
-                        
+
                         <div class="info">
-                            <strong>🐛 在 WebUI 里点击「下线」后 UI 显示错误</strong><br>
-                            这是一个已知问题，问题在于 LxHTT 编写的代码并没有完整覆盖每一种下线 cases，我们将在六月发布的版本中修复该问题。<br>
-                            您可以在「节点监控」处查看节点的版本信息，如果版本过低，您可以在群聊内提醒捐赠者升级或联系管理员清退该节点（不推荐）。
+                            <strong>🐛 在 WebUI 里点击「下线」后 UI 显示错误：</strong><br>
+                            这是一个已知问题，我们将在六月发布的版本中修复该问题。<br>
+                            您可以在「节点监控」处查看节点的版本信息。
                         </div>
-                        
+
                         <div class="danger">
                             <strong>🚫 我一直启动不了啊，能不能退款啊？</strong><br>
-                            不能，虚拟商品不支持退款，且创建隧道并不需要花任何一分钱。若你投诉我们的支付接口，我们会把你的账户封禁处理，并同步到内网穿透联盟黑名单。<br><br>
-                            遇到这种情况请你带着完整日志寻求管理或者交流群内群友的帮助，而不是发表诸如"有人吗""有大佬能帮我吗""怎么办怎么办"的言论，否则建议你立刻前往医院神经内科挂号问诊，或者把小学道法课本拿起来多翻翻。
+                            不能，虚拟商品不支持退款，且创建隧道并不需要花任何一分钱。若你投诉我们的支付接口，我们会把你的账户封禁处理。<br><br>
+                            遇到这种情况请你带着完整日志寻求管理或者交流群内群友的帮助。
                         </div>
-                        
+
                         <h4>⚠️ 安全预警</h4>
-                        <p>近期，我们监测到有未知实体正在持续对 ME Frp 穿透节点发起有组织性的大规模恶意扫描。为保障您的资产安全及业务稳定运行，请务必对通过穿透暴露的服务采取必要的安全防护措施。</p>
-                        
+                        <p>近期监测到有未知实体正在持续对 ME Frp 穿透节点发起有组织性的大规模恶意扫描。为保障您的资产安全及业务稳定运行，请务必对通过穿透暴露的服务采取必要的安全防护措施。</p>
+
                         <div class="warning">
                             <strong>Minecraft 服务防护建议：</strong><br>
-                            • 启用正版验证<br>
-                            • 安装登录验证插件<br>
-                            • 启用玩家白名单机制<br>
-                            • 不联机时关闭隧道
+                            • 启用正版验证 &nbsp;• 安装登录验证插件<br>
+                            • 启用玩家白名单机制 &nbsp;• 不联机时关闭隧道
                         </div>
-                        
+
                         <div class="warning">
                             <strong>SSH/RDP 服务防护建议：</strong><br>
-                            • 不远程时关闭隧道<br>
-                            • 使用 32 位以上混合高强度密码（SSH 使用密钥）<br>
+                            • 不远程时关闭隧道 &nbsp;• 使用高强度密码（SSH 使用密钥）<br>
                             • 及时安装系统补丁
                         </div>
-                        
+
                         <h4>🔒 封禁公告</h4>
-                        <p><strong>用户 lanjing6123（188*****6#qq.com）封号：</strong>恶意投诉 ME Frp 支付接口，在购买后 20 分钟内发起投诉，造假"交易被骗"情形。经调查，该用户未进行任何隧道启动操作，实名认证已通过，不存在无法使用情形。已封禁并拉入联合黑名单。</p>
-                        
-                        <p><strong>用户 PvZ12（2186*****1#qq.com）封号：</strong>恶意投诉 ME Frp 支付接口，在购买后 1 小时内发起投诉，无实质性退款理由。已封禁。</p>
-                        
+                        <p><strong>用户 lanjing6123 封号：</strong>恶意投诉 ME Frp 支付接口，在购买后 20 分钟内发起投诉。经调查未进行任何隧道启动操作。已封禁并拉入联合黑名单。</p>
+                        <p><strong>用户 PvZ12 封号：</strong>恶意投诉 ME Frp 支付接口，在购买后 1 小时内发起投诉，无实质性退款理由。已封禁。</p>
+
                         <div class="danger">
                             <strong>重要提醒：</strong>虚拟产品购买后默认不支持退款，请确认后再进行支付。若恶意退款/投诉，将直接封禁账户。
                         </div>
-                        
+
                         <h4>🎁 限时活动</h4>
                         <p>正式用户带宽提升至 50Mbps，VIP 带宽提升至 130Mbps，限时双倍带宽！</p>
-                        
+
                         <h4>🔗 公告链接</h4>
-                        <p>幻缘映射封禁大屏（公开版）：<a href="https://acmecloud.feishu.cn/share/base/dashboard/shrcnKAKrTdPGtytCpVUv3bLPlc" target="_blank">点击查看</a></p>
-                        
+                        <p>幻缘映射封禁大屏：<a href="https://acmecloud.feishu.cn/share/base/dashboard/shrcnKAKrTdPGtytCpVUv3bLPlc" target="_blank">点击查看</a></p>
+
                         <h4>🤖 官方机器人上线</h4>
                         <p>QQ 群机器人和飞书群机器人均已全量上线！发送 /mefrp 获取详情。绑定账户时请使用私聊。</p>
-                        
+
                         <h4>⚠️ 严打通知</h4>
-                        <p>严禁使用幻缘映射穿透 Silly Tavern、Stable Diffusion、ComfyUI 等项目。此类项目被大量用于色情内容传播，一经发现立即封禁隧道，无申诉机会。</p>
-                        
+                        <p>严禁使用幻缘映射穿透 Silly Tavern、Stable Diffusion、ComfyUI 等项目。此类项目被大量用于色情内容传播，一经发现立即封禁隧道。</p>
+
                         <h4>📝 免责声明</h4>
-                        <p>禁止穿透盗版影视资源网站、发卡网、网赚平台、色情内容、IDC 业务系统等。我们将上线内容检测系统，请用户自查整改。</p>
-                        
+                        <p>禁止穿透盗版影视资源网站、发卡网、网赚平台、色情内容、IDC 业务系统等。</p>
+
                         <h4>🔐 安全提醒</h4>
                         <p>若穿透 MCSM、Lucky、DDNS、堡塔、1Panel 等管理面板，请务必使用安全系数高的密码！</p>
-                        
+
                         <h4>💡 温馨提示</h4>
                         <ul>
                             <li>隧道名称请不要包含中文、空格、标点符号，否则会导致隧道无法启动</li>
                             <li>在用户中心实名认证后才可以使用完整功能</li>
                             <li>根据相关规定，中国大陆内节点服务不对未实名认证用户开放</li>
                         </ul>
-                        
+
                         <h4>📧 客户支持</h4>
-                        <p>遇到问题可通过以下方式寻求帮助：</p>
-                        <ul>
-                            <li>QQ 一群（推荐）</li>
-                            <li>QQ 二群</li>
-                            <li>飞书群</li>
-                            <li>邮件：support@mefrp.com（低速）</li>
-                        </ul>
+                        <p>遇到问题可通过以下方式寻求帮助：QQ 群（推荐）、飞书群、邮件 support@mefrp.com</p>
                         <p>封禁申诉问卷：<a href="https://acmecloud.feishu.cn/share/base/form/shrcn4bqX3nFLF42aFGQME7fVub" target="_blank">点击填写</a></p>
-                        
+
                         <h4>⚠️ 文件捆绑警告</h4>
                         <p>近期蓝奏云存在引流捆绑情况。使用备用链接下载时，请勿选择普通下载，选择电信或联通下载！</p>
-                        
+
                         <h4>📢 AFF 推广活动</h4>
                         <p>发布 ME Frp 教程、体验或对比内容，每 50 播放/浏览量兑 40GB 流量，每 200 播放/浏览量兑一个月 VIP！发布后向官方邮箱提交链接即可。</p>
-                        
+
                         <h4>📦 FRPC 更新</h4>
                         <p>春季创意者更新后，旧版 MEFRPC 快捷启动功能失效，请前往文件下载获取新版本。FRP 核心已放弃支持 Windows 7 及以下用户。</p>
-                        
+
                         <h4>🔍 内容分发限制</h4>
                         <p>禁止使用 ME Frp 穿透服务提供文件下载、视频流等内容分发服务（带宽容量 &lt; 60Mbps 的节点）。</p>
-                        
+
                         <h4>❤️ 感谢支持</h4>
                         <p>感谢一路以来默默支持我们的用户！赞助者专属群：721388053</p>
-                        
+
                         <div class="info">
                             <strong>提问请带眼睛，没带导致的问题一律不予解答。</strong>
                         </div>
+
+                        <p style="font-size:0.85rem;color:var(--text-secondary);margin-top:1rem;text-indent:0;">完整公告请访问 <a href="https://www.mefrp.com" target="_blank">ME Frp 官网</a></p>
                     </div>
                 </div>
             </div>
@@ -917,7 +1243,7 @@
             <div class="card">
                 <div class="card-header">
                     <span class="card-title">隧道列表</span>
-                    <button class="btn btn-primary" id="refreshTunnelsBtn">
+                    <button class="btn btn-primary" id="refreshTunnelsBtn" style="display:none">
                         <i class="fas fa-sync-alt"></i> 刷新列表
                     </button>
                 </div>
@@ -925,6 +1251,7 @@
                     <table class="data-table" id="tunnelsTable">
                         <thead>
                             <tr>
+                                <th style="width:40px;"><input type="checkbox" id="tunnelSelectAll" title="全选" onchange="toggleAllTunnelCheckboxes(this.checked)"></th>
                                 <th>ID</th>
                                 <th>名称</th>
                                 <th>类型</th>
@@ -937,7 +1264,7 @@
                         </thead>
                         <tbody id="tunnelsTableBody">
                             <tr>
-                                <td colspan="8" style="text-align: center; color: var(--text-secondary);">
+                                <td colspan="9" style="text-align: center; color: var(--text-secondary);">
                                     点击"刷新列表"按钮加载隧道数据
                                 </td>
                             </tr>
@@ -946,11 +1273,63 @@
                 </div>
             </div>
 
+            <!-- 本地FRPC客户端 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">本地 FRPC 客户端</span>
+                    <div>
+                        <button class="btn btn-outline" id="refreshFrpcStatusBtn" style="display:none">
+                            <i class="fas fa-sync-alt"></i> 刷新状态
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="stats-grid" style="margin-bottom: 1.5rem;">
+                    <div class="stat-card">
+                        <h6><i class="fas fa-running"></i> 运行状态</h6>
+                        <div class="stat-value" id="frpcRunStatus">未运行</div>
+                    </div>
+                    <div class="stat-card">
+                        <h6><i class="fas fa-microchip"></i> 进程 PID</h6>
+                        <div class="stat-value" id="frpcPid">-</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                    <button class="btn btn-success" id="startFrpcBtn" style="background-color: #10b981;">
+                        <i class="fas fa-play"></i> 启动隧道
+                    </button>
+                    <button class="btn btn-danger" id="stopFrpcBtn">
+                        <i class="fas fa-stop"></i> 停止隧道
+                    </button>
+                    <button class="btn btn-warning" id="downloadClientBtn" style="background-color: #f59e0b; color: #fff;">
+                        <i class="fas fa-download"></i> 下载客户端
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">运行日志</span>
+                        <div>
+                            <button class="btn btn-outline" id="refreshLogBtn" title="刷新日志" style="margin-right: 0.3rem;">
+                                <i class="fas fa-sync-alt"></i> 刷新
+                            </button>
+                            <button class="btn btn-outline" id="scrollToErrorBtn" title="跳转到错误日志位置" style="color: #ef4444; border-color: #ef4444;">
+                                <i class="fas fa-exclamation-triangle"></i> 错误
+                            </button>
+                        </div>
+                    </div>
+                    <div class="result-area" id="frpcLogArea" style="min-height: 200px; max-height: 400px; overflow-y: auto; font-size: 0.8rem;">
+                        暂无日志
+                    </div>
+                </div>
+            </div>
+
             <!-- 创建隧道表单 -->
             <div class="card">
                 <div class="card-header">
                     <span class="card-title">创建新隧道</span>
-                    <button class="btn btn-secondary" id="loadCreateDataBtn">
+                    <button class="btn btn-secondary" id="loadCreateDataBtn" style="display:none">
                         <i class="fas fa-download"></i> 加载节点数据
                     </button>
                 </div>
@@ -960,7 +1339,7 @@
                         <select class="form-control" id="createNodeSelect" required style="height: auto; padding: 0.5rem;">
                             <option value="">-- 请先加载节点数据 --</option>
                         </select>
-                        <button type="button" class="btn btn-sm btn-secondary" id="loadCreateDataBtn" style="margin-top: 0.5rem; width: 100%;">
+                        <button type="button" class="btn btn-sm btn-secondary" id="loadCreateDataBtn2" style="display:none; margin-top: 0.5rem; width: 100%;">
                             <i class="fas fa-database"></i> 加载节点数据
                         </button>
                     </div>
@@ -1035,7 +1414,7 @@
             <div class="card">
                 <div class="card-header">
                     <span class="card-title">可用节点</span>
-                    <button class="btn btn-secondary" id="refreshNodesBtn">
+                    <button class="btn btn-secondary" id="refreshNodesBtn" style="display:none">
                         <i class="fas fa-sync-alt"></i> 刷新节点
                     </button>
                 </div>
@@ -1064,30 +1443,91 @@
             </div>
         </section>
 
-        <section id="downloadSection" style="display: none;">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">文件下载</span>
-                </div>
-                <p>文件下载功能开发中...</p>
-            </div>
-        </section>
+        <!-- 权益抽奖区域 -->
+        <section id="lotterySection" style="display: none;">
+            <!-- 顶部信息栏 -->
+            <div style="display:flex; gap:1.5rem; margin-bottom:1.5rem; align-items:stretch;">
+                <!-- 抽奖主区域 -->
+                <div style="flex:1; min-width:0;">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title"><i class="fas fa-gift"></i> 权益抽奖</span>
+                            <span id="lotteryRemainingBadge" style="background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; padding:0.3rem 0.8rem; border-radius:20px; font-size:0.85rem; font-weight:600;">剩余次数: --</span>
+                        </div>
 
-        <section id="helpSection" style="display: none;">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">帮助中心</span>
-                </div>
-                <p>帮助中心功能开发中...</p>
-            </div>
-        </section>
+                        <!-- 奖品池展示 -->
+                        <div style="margin-bottom: 1.2rem;">
+                            <h6 style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.6rem;"><i class="fas fa-trophy"></i> 奖品池</h6>
+                            <div id="prizePoolArea" style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+                                <div style="flex:1; min-width:120px; background:var(--bg-color); border-radius:10px; padding:0.7rem; text-align:center; border:1px solid var(--border-color);">
+                                    <div style="color:var(--text-secondary); font-size:0.75rem;">加载中...</div>
+                                </div>
+                            </div>
+                        </div>
 
-        <section id="userSection" style="display: none;">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">用户中心</span>
+                        <!-- 抽奖操作区 -->
+                        <div id="lotteryResultArea" style="background: linear-gradient(135deg, rgba(102,126,234,0.08), rgba(118,75,162,0.08)); border: 2px dashed rgba(102,126,234,0.3); border-radius: 16px; padding: 2rem 1.5rem; text-align: center; position:relative; overflow:hidden;">
+                            <!-- 背景装饰 -->
+                            <div style="position:absolute; top:-30px; right:-30px; width:100px; height:100px; background:radial-gradient(circle,rgba(102,126,234,0.15),transparent); border-radius:50%;"></div>
+                            <div style="position:absolute; bottom:-20px; left:-20px; width:80px; height:80px; background:radial-gradient(circle,rgba(118,75,162,0.12),transparent); border-radius:50%;"></div>
+
+                            <!-- 未抽奖状态 -->
+                            <div id="lotteryIdle">
+                                <div style="font-size:3.5rem; margin-bottom:0.5rem; animation:bounce 2s infinite;">🎰</div>
+                                <div style="font-size:1rem; font-weight:600; color:var(--text-primary);">点击下方按钮开始抽奖</div>
+                                <div style="font-size:0.82rem; color:var(--text-secondary); margin-top:0.4rem;">每日上限 10 次，签到可获得额外次数</div>
+                            </div>
+
+                            <!-- 抽奖动画中 -->
+                            <div id="lotterySpinning" style="display:none;">
+                                <div style="font-size:3.5rem; margin-bottom:0.5rem;" id="lotterySpinIcon">🎰</div>
+                                <div style="font-size:1rem; font-weight:600; color:var(--primary-color);" id="lotterySpinText">正在抽取中...</div>
+                                <div style="margin-top:0.6rem; display:flex; justify-content:center; gap:0.4rem;" id="lotterySpinSlots"></div>
+                            </div>
+
+                            <!-- 单抽结果 -->
+                            <div id="lotterySingleResult" style="display:none;">
+                                <div style="font-size:3.5rem; margin-bottom:0.5rem;" id="singleResultIcon">🎉</div>
+                                <div id="singleResultTitle" style="font-size:1.3rem; font-weight:700;"></div>
+                                <div id="singleResultDesc" style="font-size:0.9rem; color:var(--text-secondary); margin-top:0.4rem;"></div>
+                            </div>
+
+                            <!-- 十连抽结果 -->
+                            <div id="lotteryTenResult" style="display:none;">
+                                <div style="font-size:2.5rem; margin-bottom:0.5rem;" id="tenResultIcon">🎊</div>
+                                <div id="tenResultTitle" style="font-size:1.2rem; font-weight:700;"></div>
+                                <div id="tenResultsGrid" style="display:grid; grid-template-columns:repeat(5,1fr); gap:0.5rem; margin-top:1rem;"></div>
+                                <div id="tenResultSummary" style="margin-top:0.8rem; font-size:0.9rem; color:var(--text-secondary);"></div>
+                            </div>
+                        </div>
+
+                        <!-- 抽奖按钮组 -->
+                        <div style="display:flex; gap:0.8rem; margin-top:1.2rem; justify-content:center;">
+                            <button class="btn btn-primary" id="doLotteryBtn" style="padding:0.7rem 2rem; font-size:1rem; font-weight:600; border-radius:10px; background:linear-gradient(135deg,#667eea,#764ba2); border:none;">
+                                <i class="fas fa-dice"></i> 单抽
+                            </button>
+                            <button class="btn btn-warning" id="doLotteryTenBtn" style="padding:0.7rem 2rem; font-size:1rem; font-weight:600; border-radius:10px; background:linear-gradient(135deg,#f59e0b,#ef4444); border:none; color:#fff;">
+                                <i class="fas fa-dice-d20"></i> 十连抽 (x10)
+                            </button>
+                        </div>
+
+                        <div style="margin-top:1rem; text-align:center; font-size:0.82rem; color:var(--text-secondary);">
+                            每日最多抽奖 <strong>10</strong> 次 | 签到可获得额外抽奖次数
+                        </div>
+                    </div>
                 </div>
-                <p>用户中心功能开发中...</p>
+
+                <!-- 右侧：抽奖历史 -->
+                <div style="width:300px; flex-shrink:0;">
+                    <div class="card" style="height:100%;">
+                        <div class="card-header">
+                            <span class="card-title"><i class="fas fa-history"></i> 抽奖记录</span>
+                        </div>
+                        <div id="lotteryHistoryList" style="max-height:500px; overflow-y:auto; display:flex; flex-direction:column; gap:0.4rem;">
+                            <div style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding:2rem 0;">暂无记录</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -1096,28 +1536,11 @@
                 <div class="card-header">
                     <span class="card-title">关于面板</span>
                 </div>
-                <p>ME Frp Web 管理面板 v1.0.0</p>
+                <p>MeFrp-GR-Client v1.0.0</p>
             </div>
         </section>
 
-        <section id="ordersSection" style="display: none;">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">我的订单</span>
-                </div>
-                <p>订单功能开发中...</p>
-            </div>
-        </section>
-
-        <section id="vipSection" style="display: none;">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">增值服务</span>
-                </div>
-                <p>增值服务功能开发中...</p>
-            </div>
-        </section>
-    </main>
+        </main>
 
     <script>
         // 主题切换
@@ -1155,66 +1578,291 @@
                     
                     // 更新标题
                     document.getElementById('pageTitle').textContent = link.textContent.trim();
+
+                    // 切换到抽奖区域时刷新数据
+                    if (section === 'lottery') {
+                        initLotteryPage();
+                    }
                 }
             });
         });
 
+        // ========== 登录页面逻辑 ==========
+        function showLoginPage() {
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('appBody').style.display = 'none';
+        }
+
+        function hideLoginPage() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('appBody').style.display = 'block';
+        }
+
+        // 显示/隐藏加载遮罩
+        function showLoginLoading(text) {
+            document.getElementById('loginLoadingText').textContent = text || '正在处理...';
+            document.getElementById('loginLoadingOverlay').style.display = 'flex';
+        }
+        function hideLoginLoading() {
+            document.getElementById('loginLoadingOverlay').style.display = 'none';
+        }
+
+        // 切换到具体登录表单
+        function showLoginForm(method) {
+            document.getElementById('loginMethodSelect').style.display = 'none';
+            document.getElementById('loginFormPassword').style.display = method === 'password' ? 'block' : 'none';
+            document.getElementById('loginFormToken').style.display = method === 'token' ? 'block' : 'none';
+            document.getElementById('loginFormPasskey').style.display = method === 'passkey' ? 'block' : 'none';
+        }
+
+        // 返回方式选择
+        function backToMethods() {
+            document.getElementById('loginMethodSelect').style.display = 'flex';
+            document.getElementById('loginFormPassword').style.display = 'none';
+            document.getElementById('loginFormToken').style.display = 'none';
+            document.getElementById('loginFormPasskey').style.display = 'none';
+        }
+
+        // 密码登录
+        async function handlePasswordLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('lpEmail').value.trim();
+            const password = document.getElementById('lpPassword').value;
+            const captcha = document.getElementById('lpCaptcha').value.trim();
+            if (!email || !password) {
+                showNotification('请输入邮箱和密码', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('lpSubmitBtn');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 登录中...';
+            showLoginLoading('正在验证账户信息...');
+
+            try {
+                // 调用后端登录接口（后端会调用 /api/public/login）
+                const result = await apiCallSilent('POST', '/api/login', {
+                    username: email,
+                    password: password,
+                    captchaToken: captcha || ''
+                });
+
+                // 检查登录是否成功 (新API返回 { code: 200, token: "...", message: "..." })
+                if (result && result.code === 200) {
+                    onLoginSuccess(result);
+                    return;
+                }
+                // 兼容旧格式
+                if (result && result.token) {
+                    onLoginSuccess(result);
+                    return;
+                }
+                // 错误处理
+                let errMsg = result?.error || result?.message || '登录失败，请检查用户名和密码';
+                if (result?.code === 403) errMsg = '账户被禁止登录，请联系客服';
+                else if (result?.code === 404) errMsg = '用户不存在，请先注册';
+                else if (errMsg.includes('captcha') || errMsg.includes('验证')) errMsg = '验证码错误或已过期，请重新获取';
+                showNotification(errMsg, 'error');
+            } catch (err) {
+                showNotification('网络错误: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false; btn.innerHTML = '<span>登 录</span>';
+                hideLoginLoading();
+            }
+        }
+
+        // Token 登录
+        async function handleTokenLogin(e) {
+            e.preventDefault();
+            const token = document.getElementById('tokenInput').value.trim();
+            if (!token) {
+                showNotification('请输入 Token', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('tokenSubmitBtn');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 验证中...';
+            showLoginLoading('正在验证访问令牌...');
+
+            try {
+                const result = await apiCallSilent('POST', '/api/token_login', { token });
+                if (result && (result.code === 200 || result.token || result.message?.includes('成功'))) {
+                    onLoginSuccess(result);
+                } else {
+                    showNotification(result?.error || 'Token 无效或已过期', 'error');
+                }
+            } catch (err) {
+                showNotification('网络错误: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 验证登录';
+                hideLoginLoading();
+            }
+        }
+
+        // 通用密钥(Token)登录
+        async function handlePasskeyLogin(e) {
+            e.preventDefault();
+            const token = document.getElementById('pkToken').value.trim();
+            if (!token) return;
+
+            const btn = document.getElementById('pkSubmitBtn');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 验证中...';
+            showLoginLoading('正在验证访问令牌...');
+
+            try {
+                const result = await apiCallSilent('POST', '/api/token_login', { token });
+                // 兼容多种响应格式
+                if (result && (result.code === 200 || result.token || result.message?.includes('成功'))) {
+                    onLoginSuccess(result);
+                } else {
+                    showNotification(result?.error || 'Token 无效或已过期', 'error');
+                }
+            } catch (err) {
+                showNotification('网络错误: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false; btn.innerHTML = '<i class="fas fa-fingerprint"></i> 验证并登录';
+                hideLoginLoading();
+            }
+        }
+
+        // 登录成功后的统一处理
+        function onLoginSuccess(data) {
+            hideLoginLoading();
+            hideLoginPage();
+            checkLoginStatus(); // 刷新状态
+            if (data?.warning) showNotification(data.warning, 'info');
+            else showNotification('欢迎回来！', 'success');
+        }
+
+        // 为登录页打开验证码（遵循官方文档：https://www.mefrp.com/3rdparty/captcha?client=CODENAME）
+        let loginCaptchaPopup = null;
+        function openCaptchaForLogin() {
+            loginCaptchaPopup = window.open(
+                'https://www.mefrp.com/3rdparty/captcha?client=MeFrp-GR-Client',
+                'loginCaptcha',
+                'width=420,height=520'
+            );
+            showNotification('请在弹出窗口中完成滑块验证，完成后切换到本页面，验证码将自动填入并解码', 'info');
+
+            // 自动检测窗口关闭并读取剪贴板
+            const checkClosed = setInterval(() => {
+                if (!loginCaptchaPopup || loginCaptchaPopup.closed) {
+                    clearInterval(checkClosed);
+                    setTimeout(decodeAndFillLoginCaptcha, 500);
+                }
+            }, 800);
+        }
+
+        // Base64 解码并提取 captchaToken（官方文档：解码后得到 token||client 格式）
+        async function decodeAndFillLoginCaptcha() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text && text.trim().length > 0) {
+                    // 尝试 Base64 解码
+                    try {
+                        const decoded = atob(text.trim());
+                        // 格式: token||client，取 token 部分
+                        const parts = decoded.split('||');
+                        if (parts.length >= 1 && parts[0].length > 0) {
+                            document.getElementById('lpCaptcha').value = parts[0];
+                            showNotification('验证码已自动解码填入', 'success');
+                            return;
+                        }
+                    } catch (_) {
+                        // 不是 Base64，直接使用原文
+                    }
+                    document.getElementById('lpCaptcha').value = text.trim();
+                    showNotification('验证码已填入', 'success');
+                } else {
+                    showNotification('未能读取验证码，请手动粘贴编码字符', 'info');
+                }
+            } catch (_) {
+                showNotification('请手动粘贴验证码编码字符到输入框', 'info');
+            }
+        }
+
         // 登录状态管理
         function checkLoginStatus() {
+            // 设置超时，防止请求卡住
+            const timeoutId = setTimeout(() => {
+                showLoggedOut();
+                showLoginPage();
+            }, 5000);
+
             fetch('/api/user_info')
-                .then(res => res.json())
+                .then(res => {
+                    clearTimeout(timeoutId);
+                    return res.json();
+                })
                 .then(data => {
                     if (!data.error) {
                         showLoggedIn(data);
+                        hideLoginPage();
                     } else {
                         showLoggedOut();
+                        showLoginPage();
                     }
                 })
-                .catch(() => showLoggedOut());
+                .catch(() => {
+                    clearTimeout(timeoutId);
+                    showLoggedOut();
+                    showLoginPage();
+                });
         }
 
         function showLoggedIn(userData) {
             document.getElementById('userGreeting').style.display = 'inline';
             document.getElementById('usernameDisplay').textContent = userData.username || userData.userId;
             document.getElementById('loginBtn').style.display = 'none';
-            document.getElementById('logoutBtn').style.display = 'block';
+            document.getElementById('logoutBtn').parentElement.style.display = '';
             updateUserStats(userData);
-            
-            // 登录成功后启动自动刷新
+
             sessionStorage.setItem('loggedIn', 'true');
             startAutoRefresh();
+            autoLoadDataAfterLogin();
+            loadLotteryRemaining();
         }
 
         function showLoggedOut() {
             document.getElementById('userGreeting').style.display = 'none';
             document.getElementById('loginBtn').style.display = 'inline';
-            document.getElementById('logoutBtn').style.display = 'block';
+            document.getElementById('logoutBtn').parentElement.style.display = '';
             document.getElementById('trafficValue').textContent = '--';
             document.getElementById('tunnelCount').textContent = '--';
             document.getElementById('signStatus').textContent = '--';
             document.getElementById('userGroup').textContent = '--';
-            
-            // 退出登录后停止自动刷新
+
             sessionStorage.removeItem('loggedIn');
             stopAutoRefresh();
         }
 
+        // 登录后自动加载数据
+        function autoLoadDataAfterLogin() {
+            setTimeout(() => {
+                document.getElementById('refreshTunnelsBtn')?.click();
+                document.getElementById('refreshNodesBtn')?.click();
+                document.getElementById('loadCreateDataBtn')?.click();
+            }, 500);
+        }
+
         // 更新用户统计
         function updateUserStats(data) {
-            if (data.traffic !== undefined) {
-                document.getElementById('trafficValue').textContent = formatTraffic(data.traffic);
-            }
-            if (data.tunnelCount !== undefined) {
-                document.getElementById('tunnelCount').textContent = data.tunnelCount;
-            }
+            if (data.traffic !== undefined) document.getElementById('trafficValue').textContent = formatTraffic(data.traffic);
+            if (data.tunnelCount !== undefined) document.getElementById('tunnelCount').textContent = data.tunnelCount;
             if (data.signedToday !== undefined) {
                 document.getElementById('signStatus').textContent = data.signedToday ? '已签到' : '未签到';
                 document.getElementById('signStatus').className = 'stat-value' + (data.signedToday ? ' success' : ' warning');
             }
-            if (data.userGroup !== undefined) {
-                document.getElementById('userGroup').textContent = data.userGroup;
-            }
+            if (data.userGroup !== undefined) document.getElementById('userGroup').textContent = data.userGroup;
         }
+
+        // 退出登录
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            fetch('/api/logout', { method: 'POST' }).catch(() => {});
+            showLoggedOut();
+            showLoginPage();
+            backToMethods();
+            showNotification('已退出登录', 'info');
+        });
 
         // 流量格式化（MEFrp API 返回的是 MB 单位）
         function formatTraffic(mb) {
@@ -1228,96 +1876,6 @@
             }
             return `${size.toFixed(2)} ${units[unitIndex]}`;
         }
-
-        // 模态框操作
-        const loginModal = document.getElementById('loginModal');
-        const loginBtn = document.getElementById('loginBtn');
-        const closeModal = document.getElementById('closeModal');
-
-        loginBtn.addEventListener('click', () => loginModal.classList.add('active'));
-        closeModal.addEventListener('click', () => loginModal.classList.remove('active'));
-
-        // 登录方式切换
-        const passwordTab = document.getElementById('passwordTab');
-        const tokenTab = document.getElementById('tokenTab');
-        const passwordForm = document.getElementById('passwordLoginForm');
-        const tokenForm = document.getElementById('tokenLoginForm');
-
-        passwordTab.addEventListener('click', () => {
-            passwordTab.classList.add('active');
-            tokenTab.classList.remove('active');
-            passwordForm.style.display = 'block';
-            tokenForm.style.display = 'none';
-        });
-
-        tokenTab.addEventListener('click', () => {
-            tokenTab.classList.add('active');
-            passwordTab.classList.remove('active');
-            tokenForm.style.display = 'block';
-            passwordForm.style.display = 'none';
-        });
-
-        // 密码登录
-        passwordForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const captcha = document.getElementById('loginCaptcha').value;
-            
-            if (!email || !password) {
-                alert('请填写邮箱和密码');
-                return;
-            }
-
-            const result = await apiCall('POST', '/api/login', {
-                email,
-                password,
-                captcha_token: captcha || 'test'
-            });
-            
-            if (result && !result.error) {
-                loginModal.classList.remove('active');
-                checkLoginStatus();
-                showNotification('登录成功！', 'success');
-            }
-        });
-
-        // Token 登录
-        tokenForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const token = document.getElementById('loginToken').value;
-            
-            if (!token) {
-                alert('请输入 Token');
-                return;
-            }
-
-            const result = await apiCall('POST', '/api/token_login', { token });
-            
-            if (result && !result.error) {
-                loginModal.classList.remove('active');
-                document.getElementById('loginToken').value = ''; // 清空 Token
-                checkLoginStatus();
-                showNotification('Token 登录成功！', 'success');
-            }
-        });
-
-        // 获取登录验证码
-        document.getElementById('getLoginCaptcha').addEventListener('click', () => {
-            window.open(
-                'https://www.mefrp.com/3rdparty/captcha?client=CODENAME',
-                'captcha',
-                'width=400,height=500'
-            );
-            showNotification('请在弹出窗口中完成验证码验证，然后手动复制验证码到输入框', 'info');
-        });
-
-        // 退出登录
-        document.getElementById('logoutBtn').addEventListener('click', async () => {
-            await apiCall('POST', '/api/logout');
-            showLoggedOut();
-            showNotification('已退出登录', 'info');
-        });
 
         // API 调用封装（显示在结果区域）
         async function apiCall(method, url, body = null) {
@@ -1377,45 +1935,58 @@
         });
 
         document.getElementById('signBtn').addEventListener('click', () => {
-            showNotification('请在下方签到区域填写验证码后再签到', 'info');
+            document.getElementById('signCaptcha').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('signCaptcha').focus();
+            document.getElementById('openCaptchaBtn').click();
         });
 
         document.getElementById('refreshTokenBtn').addEventListener('click', () => {
             apiCall('POST', '/api/refresh_token');
         });
 
-        document.getElementById('listTunnelsBtn').addEventListener('click', () => {
-            apiCallSilent('GET', '/api/tunnels').then(data => {
-                if (data && !data.error && data.proxies) {
-                    renderTunnelsTable(data.proxies, data.nodes);
-                    showNotification(`已加载 ${data.proxies.length} 个隧道`, 'success');
-                } else {
-                    showNotification('获取隧道列表失败', 'error');
-                }
-            });
-        });
-
-        document.getElementById('listNodesBtn').addEventListener('click', () => {
-            apiCallSilent('GET', '/api/nodes').then(data => {
-                if (data && !data.error && data.nodes) {
-                    renderNodesTable(data.nodes);
-                    showNotification(`已加载 ${data.nodes.length} 个节点`, 'success');
-                } else {
-                    showNotification('获取节点列表失败', 'error');
-                }
-            });
-        });
-
-        // 签到功能
+        // 签到功能 - 打开验证码并自动检测填写
+        let captchaPopup = null;
         document.getElementById('openCaptchaBtn').addEventListener('click', () => {
-            window.open(
-                'https://www.mefrp.com/3rdparty/captcha?client=CODENAME',
+            captchaPopup = window.open(
+                'https://www.mefrp.com/3rdparty/captcha?client=MeFrp-GR-Client',
                 'captcha',
                 'width=400,height=500'
             );
-            showNotification('请在弹出窗口中完成验证码验证，然后手动复制验证码到输入框', 'info');
+            showNotification('请在弹出窗口中完成滑块验证，完成后切换到本页面，验证码将自动填入', 'info');
+            
+            // 启动自动检测：窗口重新获得焦点时尝试从剪贴板读取
+            if (captchaPopup) {
+                const checkInterval = setInterval(() => {
+                    // 如果弹窗已关闭或用户已切回, 读取剪贴板
+                    if (captchaPopup.closed || document.hasFocus()) {
+                        clearInterval(checkInterval);
+                        // 延迟一下等待剪贴板更新
+                        setTimeout(autoFillCaptcha, 500);
+                    }
+                }, 500);
+            }
         });
 
+        // 自动填写验证码（从剪贴板读取）
+        async function autoFillCaptcha() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text && text.length > 10) {
+                    document.getElementById('signCaptcha').value = text;
+                    showNotification('验证码已自动填入！', 'success');
+                    // 自动触发签到
+                    setTimeout(() => document.getElementById('doSignBtn').click(), 300);
+                } else {
+                    // 剪贴板内容太短，提示手动粘贴
+                    showNotification('未能自动读取验证码，请手动粘贴', 'info');
+                }
+            } catch (err) {
+                console.log('剪贴板读取失败（需要用户权限）:', err.message);
+                showNotification('请完成验证后手动粘贴验证码到输入框', 'info');
+            }
+        }
+
+        // 签到按钮
         document.getElementById('doSignBtn').addEventListener('click', async () => {
             const captcha = document.getElementById('signCaptcha').value.trim();
             
@@ -1429,7 +2000,6 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 签到中...';
             btn.disabled = true;
             
-            // 使用后台静默调用
             const result = await apiCallSilent('POST', '/api/sign', { captcha_token: captcha });
             
             btn.innerHTML = originalText;
@@ -1438,12 +2008,444 @@
             if (result && !result.error) {
                 showNotification('签到成功！', 'success');
                 document.getElementById('signCaptcha').value = '';
-                // 刷新用户信息
                 apiCallSilent('GET', '/api/user_info').then(data => updateUserStats(data));
+                // 刷新抽奖剩余次数
+                loadLotteryRemaining();
             } else if (result && result.need_captcha) {
-                showNotification('需要验证码：' + result.message, 'warning');
+                showNotification('验证码无效或已过期，请重新获取', 'warning');
+            } else if (result && result.already_signed) {
+                showNotification('今日已签到', 'info');
             } else {
-                showNotification('签到失败：' + (result?.error || '未知错误'), 'error');
+                showNotification(result?.error || '签到失败', 'error');
+            }
+        });
+
+        // ========== 权益抽奖 ==========
+        const LOTTERY_MAX_DAILY = 10;
+        let lotteryTodayCount = 0;
+        let lotteryHistoryList = [];
+        let isLotteryDrawing = false;
+
+        // 奖品图标映射（根据商品类型）
+        const PRIZE_ICONS = {
+            'traffic': { icon: '📦', color: '#3b82f6', label: '流量' },
+            'vip': { icon: '👑', color: '#f59e0b', label: 'VIP' },
+            'coupon': { icon: '🎫', color: '#8b5cf6', label: '优惠券' },
+            'default': { icon: '🎁', color: '#10b981', label: '奖励' }
+        };
+
+        // 加载剩余次数
+        async function loadLotteryRemaining() {
+            try {
+                const result = await apiCallSilent('GET', '/api/lottery/remaining');
+                if (result && !result.error) {
+                    let remaining = 0;
+                    if (result.data !== undefined && result.data !== null) {
+                        if (typeof result.data === 'number') {
+                            remaining = result.data;
+                        } else if (typeof result.data === 'object') {
+                            remaining = result.data.remaining || result.data.count || result.data.left || 0;
+                        }
+                    }
+                    // 也尝试从 message 或其他字段解析
+                    if (!remaining && typeof result.message === 'string') {
+                        const m = result.message.match(/(\d+)/);
+                        if (m) remaining = parseInt(m[1]);
+                    }
+
+                    document.getElementById('lotteryRemainingBadge').textContent = `剩余次数: ${remaining}`;
+                    updateLotteryButtons(remaining);
+                }
+            } catch (e) {
+                console.warn('[抽奖] 获取次数失败:', e);
+            }
+        }
+
+        // 更新按钮状态（每日10次限制）
+        function updateLotteryButtons(remaining) {
+            const singleBtn = document.getElementById('doLotteryBtn');
+            const tenBtn = document.getElementById('doLotteryTenBtn');
+            const canSingle = remaining >= 1 && !isLotteryDrawing;
+            const canTen = remaining >= 10 && !isLotteryDrawing;
+
+            singleBtn.disabled = !canSingle;
+            tenBtn.disabled = !canTen;
+
+            singleBtn.style.opacity = canSingle ? '1' : '0.5';
+            tenBtn.style.opacity = canTen ? '1' : '0.5';
+
+            if (remaining < 10) {
+                tenBtn.title = `需要至少10次机会，当前仅剩${remaining}次`;
+            } else {
+                tenBtn.title = '消耗10次抽奖机会，连续抽取10次';
+            }
+        }
+
+        // 加载奖品池
+        async function loadPrizePool() {
+            try {
+                const result = await apiCallSilent('GET', '/api/store/products');
+                console.log('[奖品池] API返回数据:', JSON.stringify(result));
+                const area = document.getElementById('prizePoolArea');
+
+                // 兼容多种API响应格式
+                let prizes = null;
+
+                if (result && result.code === 200 && Array.isArray(result.data) && result.data.length > 0) {
+                    prizes = result.data.filter(p => p.enabled);
+                } else if (result && Array.isArray(result.data) && result.data.length > 0) {
+                    prizes = result.data;
+                } else if (result && result.data && typeof result.data === 'object' && !Array.isArray(result.data)) {
+                    // 对象格式：{ "广告位额废": { name, price, unit }, ... }
+                    prizes = Object.entries(result.data).map(([key, val]) => ({
+                        name: key,
+                        ...(typeof val === 'object' ? val : { price: val, unit: '' })
+                    }));
+                }
+
+                if (prizes && prizes.length > 0) {
+                    area.innerHTML = prizes.map(p => {
+                        const typeInfo = PRIZE_ICONS[p.type] || PRIZE_ICONS['default'];
+                        const displayName = p.name || p.title || '未知奖品';
+                        const displayValue = p.price != null ? `${p.price}${p.unit || ''}` : (p.desc || '');
+                        return `
+                            <div style="flex:1; min-width:110px; background:var(--bg-color); border-radius:10px; padding:0.7rem 0.5rem; text-align:center; border:1px solid var(--border-color); transition:transform 0.2s, box-shadow 0.2s;" onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(102,126,234,0.15)'" onmouseleave="this.style.transform='none';this.style.boxShadow='none'">
+                                <div style="font-size:1.5rem;">${typeInfo.icon}</div>
+                                <div style="font-size:0.78rem; font-weight:600; margin-top:0.3rem; color:${typeInfo.color};">${displayName}</div>
+                                ${displayValue ? `<div style="font-size:0.7rem; color:var(--text-secondary); margin-top:0.15rem;">${displayValue}</div>` : ''}
+                            </div>`;
+                    }).join('');
+                } else {
+                    // 默认奖品池（与官方一致）
+                    const defaultPrizes = [
+                        { icon: '🎁', name: '随机立减优惠码', desc: '15%', color: '#8b5cf6' },
+                        { icon: '📦', name: '10 GB 流量', desc: '30%', color: '#3b82f6' },
+                        { icon: '📦', name: '25 GB 流量', desc: '20%', color: '#06b6d4' },
+                        { icon: '📦', name: '40 GB 流量', desc: '15%', color: '#10b981' },
+                        { icon: '📦', name: '55 GB 流量', desc: '10%', color: '#22c55e' },
+                        { icon: '📦', name: '70 GB 流量', desc: '5%', color: '#84cc16' },
+                        { icon: '📦', name: '85 GB 流量', desc: '3%', color: '#eab308' },
+                        { icon: '⭐', name: '100 GB 流量', desc: '1%', color: '#f97316', rare: true },
+                        { icon: '✨', name: '120 GB 流量', desc: '1%', color: '#ef4444', rare: true },
+                        { icon: '🏆', name: '特殊奖励', desc: '0%', color: '#ec4899', rare: true },
+                    ];
+                    area.innerHTML = defaultPrizes.map((p, i) => `
+                        <div style="flex:1; min-width:95px; background:${p.rare ? 'linear-gradient(135deg, rgba(239,68,68,0.08), rgba(236,72,153,0.08))' : 'var(--bg-color)'}; border-radius:10px; padding:0.65rem 0.45rem; text-align:center; border:1px solid ${p.rare ? 'rgba(239,68,68,0.25)' : 'var(--border-color)'}; position:relative; overflow:hidden; transition:all 0.25s ease;" onmouseenter="this.style.transform='translateY(-3px)';this.style.boxShadow='0 6px 20px ${p.rare ? 'rgba(239,68,68,0.2)' : 'rgba(99,102,241,0.12)'}';" onmouseleave="this.style.transform='none';this.style.boxShadow='none'">
+                            ${p.rare ? `<div style="position:absolute; top:-8px; right:-8px; width:26px; height:26px; background:linear-gradient(135deg,#f59e0b,#ef4444); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.55rem; color:#fff; font-weight:700;">SSR</div>` : ''}
+                            <div style="font-size:${i >= 9 ? '1.65rem' : '1.4rem'}; ${i >= 8 ? 'animation:pulseGlow 2.5s ease-in-out infinite;' : ''}">${p.icon}</div>
+                            <div style="font-size:0.75rem; font-weight:600; margin-top:0.25rem; color:${p.color};">${p.name}</div>
+                            <div style="font-size:0.68rem; color:${p.rare ? '#f59e0b' : 'var(--text-secondary)'}; margin-top:0.1rem; font-weight:${p.rare ? '700' : '400'};">${p.desc}</div>
+                        </div>`).join('');
+                }
+            } catch (e) {
+                console.warn('[抽奖] 奖品池加载失败:', e);
+            }
+        }
+
+        // 解析单条抽奖结果
+        function parseLotteryResult(result) {
+            const data = result?.data || {};
+            const msg = result?.message || '';
+            // 支持多种字段名
+            const prizeName = data.prize_name || data.name || data.prize || data.title || data.reward_name || data.product_name || '';
+
+            // 判断结果类型（更宽松的未中奖判断）
+            const notWonKeywords = ['谢谢参与', '未中奖', '遗憾', '很遗憾', '未获得', '很遗憾未获得'];
+            const isNotWon = notWonKeywords.some(kw => msg.includes(kw)) ||
+                prizeName === '' ||
+                prizeName === '谢谢参与' ||
+                data.is_won === false ||
+                data.won === false;
+
+            if (isNotWon) {
+                return { icon: '😢', color: '#9ca3af', title: '很遗憾，未中奖', desc: msg || '下次再来试试吧！', isWin: false };
+            }
+
+            // 智能识别奖品类型
+            const prizeType = data.prize_type || data.type || data.reward_type || data.category || '';
+            const amount = data.amount || data.value || data.traffic || data.duration || data.count || '';
+
+            const typeInfo = PRIZE_ICONS[prizeType] || (() => {
+                if (msg.includes('流量') || msg.includes('GB') || prizeName.includes('GB')) return PRIZE_ICONS['traffic'];
+                if (msg.includes('VIP') || msg.includes('会员') || prizeName.includes('VIP')) return PRIZE_ICONS['vip'];
+                if (msg.includes('优惠券') || msg.includes('抵扣') || prizeName.includes('优惠')) return PRIZE_ICONS['coupon'];
+                if (msg.includes('隧道') || prizeName.includes('隧道')) return PRIZE_ICONS['tunnel'];
+                if (msg.includes('加速') || msg.includes('节点') || prizeName.includes('加速')) return PRIZE_ICONS['tunnel'];
+                if (msg.includes('实名')) return PRIZE_ICONS['default'];
+                if (msg.includes('广告') || prizeName.includes('广告')) return PRIZE_ICONS['default'];
+                return PRIZE_ICONS['default'];
+            })();
+
+            // 构建描述文字
+            let descText = msg;
+            if (!descText && amount) descText = `${typeInfo.label} +${amount}`;
+            if (!descText && prizeName) descText = prizeName;
+
+            return {
+                icon: typeInfo.icon,
+                color: typeInfo.color,
+                title: `恭喜获得 ${prizeName || typeInfo.label}！`,
+                desc: descText,
+                isWin: true,
+                amount: amount,
+                prizeName: prizeName || typeInfo.label
+            };
+        }
+
+        // 显示单抽结果
+        function showSingleResult(parsed) {
+            document.getElementById('lotteryIdle').style.display = 'none';
+            document.getElementById('lotterySpinning').style.display = 'none';
+            document.getElementById('lotterySingleResult').style.display = 'block';
+            document.getElementById('lotteryTenResult').style.display = 'none';
+
+            document.getElementById('singleResultIcon').textContent = parsed.icon;
+            document.getElementById('singleResultTitle').textContent = parsed.title;
+            document.getElementById('singleResultTitle').style.color = parsed.color;
+            document.getElementById('singleResultDesc').textContent = parsed.desc;
+
+            addLotteryHistory(parsed.icon, parsed.title, parsed.prizeName || parsed.desc);
+
+            if (parsed.isWin) showNotification(parsed.title, 'success');
+            else showNotification(parsed.title, 'info');
+        }
+
+        // 显示十连抽结果
+        function showTenResults(results) {
+            document.getElementById('lotteryIdle').style.display = 'none';
+            document.getElementById('lotterySpinning').style.display = 'none';
+            document.getElementById('lotterySingleResult').style.display = 'none';
+            document.getElementById('lotteryTenResult').style.display = 'block';
+
+            const winCount = results.filter(r => r.isWin).length;
+            const bestPrize = results.find(r => r.isWin) || results[0];
+
+            document.getElementById('tenResultIcon').textContent = winCount > 0 ? '🎊' : '😅';
+            document.getElementById('tenResultTitle').textContent =
+                winCount > 0 ? `十连抽完成！命中 ${winCount} 个奖品` : '十连抽完成，全部未中奖';
+            document.getElementById('tenResultTitle').style.color = winCount > 0 ? '#10b981' : '#9ca3af';
+
+            // 5x2 网格显示每次结果
+            document.getElementById('tenResultsGrid').innerHTML = results.map(r => `
+                <div style="background:var(--bg-color); border-radius:8px; padding:0.6rem; text-align:center; border:1px solid ${r.isWin ? r.color + '40' : 'var(--border-color)'};">
+                    <div style="font-size:1.3rem;">${r.icon}</div>
+                    <div style="font-size:0.68rem; color:${r.color}; margin-top:0.2rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                        ${r.isWin ? (r.prizeName || '中奖') : '未中'}
+                    </div>
+                </div>`).join('');
+
+            // 汇总
+            const summaryItems = results.filter(r => r.isWin).map(r => `${r.icon} ${r.prizeName}`);
+            document.getElementById('tenResultSummary').textContent =
+                winCount > 0 ? `获得: ${summaryItems.join('、')}` : '再接再厉！';
+
+            // 添加历史记录
+            addLotteryHistory(winCount > 0 ? '🎊' : '😅',
+                `十连抽 - ${winCount > 0 ? `命中${winCount}奖` : '未中奖'}`,
+                summaryItems.length > 0 ? summaryItems.join(', ') : '');
+
+            showNotification(`十连抽完成 - ${winCount > 0 ? `命中${winCount}个` : '未中奖'}`, winCount > 0 ? 'success' : 'info');
+        }
+
+        // 重置到空闲状态
+        function resetLotteryIdle() {
+            document.getElementById('lotteryIdle').style.display = 'block';
+            document.getElementById('lotterySpinning').style.display = 'none';
+            document.getElementById('lotterySingleResult').style.display = 'none';
+            document.getElementById('lotteryTenResult').style.display = 'none';
+        }
+
+        // 执行抽奖动画
+        function startSpinAnimation(isTen) {
+            resetLotteryIdle();
+            document.getElementById('lotteryIdle').style.display = 'none';
+            document.getElementById('lotterySpinning').style.display = 'block';
+
+            const spinIcon = document.getElementById('lotterySpinIcon');
+            const spinText = document.getElementById('lotterySpinText');
+            const spinSlots = document.getElementById('lotterySpinSlots');
+
+            spinText.textContent = isTen ? '正在十连抽取中...' : '正在抽取中...';
+
+            if (isTen) {
+                // 十连抽显示10个槽位
+                spinSlots.innerHTML = Array(10).fill(0).map(() =>
+                    `<div style="width:36px; height:44px; background:var(--bg-color); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; border:1px solid var(--border-color);">
+                        <span class="slot-item">❓</span>
+                    </div>`
+                ).join('');
+            } else {
+                spinSlots.innerHTML = '';
+            }
+
+            const icons = ['🎰','🎲','🎯','🎁','💎','⭐','🔮','🎪'];
+            let spins = 0;
+            return setInterval(() => {
+                spinIcon.textContent = icons[spins % icons.length];
+                spins++;
+                if (isTen) {
+                    document.querySelectorAll('.slot-item').forEach(el => {
+                        el.textContent = icons[Math.floor(Math.random() * icons.length)];
+                    });
+                }
+            }, 80);
+        }
+
+        // ========== 单抽按钮 ==========
+        document.getElementById('doLotteryBtn').addEventListener('click', async () => {
+            if (isLotteryDrawing) return;
+            isLotteryDrawing = true;
+            updateLotteryButtons(0);
+
+            const btn = document.getElementById('doLotteryBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 抽取中';
+
+            const spinInterval = startSpinAnimation(false);
+
+            try {
+                const result = await apiCallSilent('POST', '/api/lottery/draw');
+                clearInterval(spinInterval);
+
+                if (result && !result.error) {
+                    const parsed = parseLotteryResult(result);
+                    showSingleResult(parsed);
+                } else {
+                    showSingleResult({ icon: '❌', color: '#ef4444', title: result?.message || result?.error || '抽奖失败', desc: '可能是次数不足或网络问题', isWin: false });
+                }
+
+                loadLotteryRemaining();
+            } catch (err) {
+                clearInterval(spinInterval);
+                showSingleResult({ icon: '❌', color: '#ef4444', title: '网络异常', desc: err.message || '无法连接服务器', isWin: false });
+            } finally {
+                btn.innerHTML = originalText;
+                isLotteryDrawing = false;
+                loadLotteryRemaining();
+            }
+        });
+
+        // ========== 十连抽按钮 ==========
+        document.getElementById('doLotteryTenBtn').addEventListener('click', async () => {
+            if (isLotteryDrawing) return;
+
+            // 检查剩余次数
+            const badge = document.getElementById('lotteryRemainingBadge').textContent;
+            const currentMatch = badge.match(/(\d+)/);
+            const currentRemaining = currentMatch ? parseInt(currentMatch[1]) : 0;
+
+            if (currentRemaining < 10) {
+                showNotification(`十连抽需要10次机会，当前仅剩${currentRemaining}次`, 'warning');
+                return;
+            }
+
+            isLotteryDrawing = true;
+            updateLotteryButtons(0);
+
+            const btn = document.getElementById('doLotteryTenBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 抽取中...';
+
+            const spinInterval = startSpinAnimation(true);
+
+            try {
+                const results = [];
+
+                // 连续执行10次抽奖
+                for (let i = 0; i < 10; i++) {
+                    try {
+                        const result = await apiCallSilent('POST', '/api/lottery/draw');
+                        if (result && !result.error) {
+                            results.push(parseLotteryResult(result));
+                        } else {
+                            results.push({
+                                icon: '❌', color: '#ef4444',
+                                title: '失败', desc: result?.message || '未知错误',
+                                isWin: false, prizeName: ''
+                            });
+                        }
+                    } catch (err) {
+                        results.push({
+                            icon: '❌', color: '#ef4444',
+                            title: '异常', desc: err.message || '网络错误',
+                            isWin: false, prizeName: ''
+                        });
+                    }
+
+                    // 更新槽位动画（逐个停止）
+                    const slots = document.querySelectorAll('.slot-item');
+                    if (slots[i]) {
+                        const lastResult = results[results.length - 1];
+                        slots[i].textContent = lastResult.icon;
+                        slots[i].parentElement.style.borderColor = lastResult.isWin ? lastResult.color + '60' : 'var(--border-color)';
+                    }
+
+                    // 每次之间稍作延迟，让用户看到效果
+                    if (i < 9) await new Promise(r => setTimeout(r, 300));
+                }
+
+                clearInterval(spinInterval);
+                showTenResults(results);
+                loadLotteryRemaining();
+
+            } catch (err) {
+                clearInterval(spinInterval);
+                resetLotteryIdle();
+                document.getElementById('lotteryIdle').style.display = 'none';
+                document.getElementById('lotterySingleResult').style.display = 'block';
+                document.getElementById('singleResultIcon').textContent = '❌';
+                document.getElementById('singleResultTitle').textContent = '网络异常';
+                document.getElementById('singleResultTitle').style.color = '#ef4444';
+                document.getElementById('singleResultDesc').textContent = err.message || '无法连接服务器';
+            } finally {
+                btn.innerHTML = originalText;
+                isLotteryDrawing = false;
+                loadLotteryRemaining();
+            }
+        });
+
+        // 添加历史记录
+        function addLotteryHistory(icon, title, detail) {
+            const time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            lotteryHistoryList.unshift({ icon, title, detail, time });
+            if (lotteryHistoryList.length > 20) lotteryHistoryList.pop();
+
+            const list = document.getElementById('lotteryHistoryList');
+            list.innerHTML = lotteryHistoryList.map(h => `
+                <div style="display:flex;align-items:center;gap:0.6rem;padding:0.55rem 0.75rem;background:var(--bg-color);border-radius:8px;font-size:0.82rem;border-left:3px solid var(--border-color);">
+                    <span style="font-size:1.1rem;flex-shrink:0;">${h.icon}</span>
+                    <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-primary);">${h.title}</span>
+                    <span style="color:var(--text-secondary);font-size:0.7rem;flex-shrink:0;">${h.time}</span>
+                </div>`).join('');
+        }
+
+        // 进入抽奖页面时加载数据
+        function initLotteryPage() {
+            loadLotteryRemaining();
+            loadPrizePool();
+        }
+
+        // ========== 错误日志跳转 ==========
+        document.getElementById('scrollToErrorBtn').addEventListener('click', () => {
+            const logArea = document.getElementById('frpcLogArea');
+            const text = logArea.textContent;
+            // 查找 "错误" 或 "panic" 或 "error" 关键词
+            const lines = text.split('\n');
+            let errorLineIndex = -1;
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].toLowerCase();
+                if (line.includes('错误') || line.includes('error') || line.includes('panic') || line.includes('崩溃') || line.includes('exit')) {
+                    errorLineIndex = i;
+                    break;
+                }
+            }
+            if (errorLineIndex >= 0) {
+                // 估算行高并滚动到错误位置
+                const lineHeight = 18;
+                logArea.scrollTop = errorLineIndex * lineHeight - 50;
+                showNotification('已跳转到错误日志位置', 'info');
+            } else {
+                showNotification('未找到错误日志', 'info');
             }
         });
 
@@ -1457,12 +2459,15 @@
             setTimeout(() => notification.remove(), 3000);
         }
 
-        // 刷新隧道列表（后台静默获取）
+        // 刷新隧道列表（后台静默获取，保留勾选状态）
         document.getElementById('refreshTunnelsBtn').addEventListener('click', () => {
             const btn = document.getElementById('refreshTunnelsBtn');
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 加载中...';
             btn.disabled = true;
+            
+            // 保存当前勾选的隧道ID，刷新后恢复
+            const savedChecked = Array.from(document.querySelectorAll('.frpc-tunnel-checkbox:checked')).map(cb => cb.value);
             
             // 使用后台静默调用
             apiCallSilent('GET', '/api/tunnels').then(data => {
@@ -1472,7 +2477,16 @@
                 if (data && !data.error) {
                     if (data.proxies && Array.isArray(data.proxies)) {
                         renderTunnelsTable(data.proxies, data.nodes);
-                        // 静默模式，不显示通知
+                        // 恢复之前勾选的隧道
+                        if (savedChecked.length > 0) {
+                            setTimeout(() => {
+                                document.querySelectorAll('.frpc-tunnel-checkbox').forEach(cb => {
+                                    if (savedChecked.includes(cb.value)) {
+                                        cb.checked = true;
+                                    }
+                                });
+                            }, 50);
+                        }
                     } else {
                         console.warn('隧道数据格式错误');
                     }
@@ -1522,6 +2536,9 @@
         if (sessionStorage.getItem('loggedIn') === 'true') {
             setTimeout(() => {
                 startAutoRefresh();
+                // 页面恢复时也自动加载隧道和节点
+                autoLoadDataAfterLogin();
+                loadLotteryRemaining();
             }, 1000); // 延迟1秒启动，确保页面已完全加载
         }
         
@@ -1538,18 +2555,18 @@
                 
                 if (data && !data.error && data.nodes) {
                     renderNodeSelect(data.nodes);
-                    showNotification('节点数据加载成功', 'success');
+                    // 静默加载，不弹通知
                 } else {
-                    showNotification('节点数据加载失败：' + (data?.error || '未知错误'), 'error');
+                    console.warn('节点数据加载失败：' + (data?.error || '未知错误'));
                 }
             }).catch(err => {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
-                showNotification('加载失败：' + err.message, 'error');
+                console.error('加载失败：' + err.message);
             });
         });
         
-        // 刷新节点列表（后台静默获取）
+        // 刷新节点列表（后台静默获取，无弹窗打扰）
         document.getElementById('refreshNodesBtn').addEventListener('click', () => {
             const btn = document.getElementById('refreshNodesBtn');
             const originalText = btn.innerHTML;
@@ -1562,14 +2579,14 @@
                 
                 if (data && !data.error && data.nodes) {
                     renderNodesTable(data.nodes);
-                    showNotification(`成功加载 ${data.nodes.length} 个节点`, 'success');
+                    // 静默加载，不弹通知
                 } else {
-                    showNotification('节点列表加载失败：' + (data?.error || '未知错误'), 'error');
+                    console.warn('节点列表加载失败：' + (data?.error || '未知错误'));
                 }
             }).catch(err => {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
-                showNotification('加载失败：' + err.message, 'error');
+                console.error('加载失败：' + err.message);
             });
         });
 
@@ -1580,7 +2597,7 @@
             console.log('渲染隧道列表 - 数据：', { proxies, nodes });
             
             if (!proxies || proxies.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-secondary);">暂无隧道</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--text-secondary);">暂无隧道</td></tr>';
                 return;
             }
 
@@ -1610,6 +2627,7 @@
                 
                 return `
                     <tr data-proxy-id="${proxy.proxyId}">
+                        <td><input type="checkbox" class="frpc-tunnel-checkbox" value="${proxy.proxyId}" ${isDisabled ? 'disabled' : ''}></td>
                         <td>${proxy.proxyId || '-'}</td>
                         <td>${proxy.proxyName || '-'}</td>
                         <td><span class="status-badge ${proxyType.toLowerCase()}">${proxyType.toUpperCase()}</span></td>
@@ -1622,8 +2640,11 @@
                             </span>
                         </td>
                         <td>
-                            <button class="btn btn-sm btn-secondary" onclick="toggleTunnel(${proxy.proxyId})" title="${isDisabled ? '启用' : '禁用'}">
+                            <button class="btn btn-sm btn-secondary" onclick="toggleTunnel(${proxy.proxyId}, ${isDisabled})" title="${isDisabled ? '启用' : '禁用'}">
                                 <i class="fas fa-${isDisabled ? 'play' : 'pause'}"></i>
+                            </button>
+                            <button class="btn btn-sm btn-info" onclick="viewTunnelConfig(${proxy.proxyId})" title="查看配置">
+                                <i class="fas fa-cog"></i>
                             </button>
                             <button class="btn btn-sm btn-danger" onclick="deleteTunnel(${proxy.proxyId})" title="删除">
                                 <i class="fas fa-trash"></i>
@@ -1634,8 +2655,17 @@
             }).join('');
 
             tbody.innerHTML = html;
+            
+            document.getElementById('tunnelSelectAll').checked = false;
+            
             console.log(`渲染了 ${proxies.length} 个隧道`);
         }
+        
+        window.toggleAllTunnelCheckboxes = function(checked) {
+            document.querySelectorAll('.frpc-tunnel-checkbox:not(:disabled)').forEach(cb => {
+                cb.checked = checked;
+            });
+        };
 
         // 渲染节点选择下拉框
         function renderNodeSelect(nodes) {
@@ -1675,12 +2705,15 @@
         }
 
         // 切换隧道状态
-        window.toggleTunnel = function(proxyId) {
-            if (confirm('确定要切换此隧道状态吗？')) {
-                apiCall('POST', '/api/close_tunnel', { id: proxyId }).then(data => {
-                    if (!data.error) {
-                        showNotification('隧道状态切换成功', 'success');
+        window.toggleTunnel = function(proxyId, isDisabled) {
+            const action = isDisabled ? '启用' : '禁用';
+            if (confirm(`确定要${action}此隧道吗？`)) {
+                apiCall('POST', '/api/toggle_tunnel', { proxyId: proxyId, isDisabled: !isDisabled }).then(data => {
+                    if (data && (data.code === 200 || data.success)) {
+                        showNotification(`隧道${action}成功`, 'success');
                         document.getElementById('refreshTunnelsBtn').click();
+                    } else {
+                        showNotification(data?.message || '操作失败', 'error');
                     }
                 });
             }
@@ -1693,6 +2726,42 @@
                     if (!data.error) {
                         showNotification('隧道删除成功', 'success');
                         document.getElementById('refreshTunnelsBtn').click();
+                    }
+                });
+            }
+        };
+
+        // 查看隧道配置
+        window.viewTunnelConfig = function(proxyId) {
+            apiCall('POST', '/api/tunnel/config', { proxyId: proxyId, format: 'string' }).then(data => {
+                if (data && data.code === 200 && data.data) {
+                    const configContent = data.data.config || '暂无配置';
+                    const configType = data.data.type || 'TOML';
+                    showNotification(`隧道 ${proxyId} 配置已获取（${configType}格式）`, 'success');
+                    
+                    // 在通知中显示配置
+                    setTimeout(() => {
+                        const configWindow = window.open('', '_blank', 'width=800,height=600');
+                        configWindow.document.write(`<html><head><title>隧道 ${proxyId} 配置</title>`);
+                        configWindow.document.write(`<style>body{font-family:monospace;padding:20px;background:#1e293b;color:#e2e8f0;white-space:pre-wrap;word-break:break-all;}</style>`);
+                        configWindow.document.write(`</head><body><h2>隧道 ${proxyId} 配置 (${configType})</h2><hr><pre>${configContent}</pre></body></html>`);
+                        configWindow.document.close();
+                    }, 500);
+                } else {
+                    showNotification('获取配置失败：' + (data?.message || '未知错误'), 'error');
+                }
+            });
+        };
+
+        // 强制下线隧道
+        window.kickTunnel = function(proxyId) {
+            if (confirm('确定要强制下线此隧道吗？')) {
+                apiCall('POST', '/api/kick_tunnel', { proxyId: proxyId }).then(data => {
+                    if (data && (data.code === 200 || data.success)) {
+                        showNotification('强制下线成功', 'success');
+                        document.getElementById('refreshTunnelsBtn').click();
+                    } else {
+                        showNotification(data?.message || '操作失败', 'error');
                     }
                 });
             }
@@ -1773,8 +2842,174 @@
             }
         });
 
-        // 页面加载时检查登录状态
+        // ==================== FRPC 客户端管理 (隧道管理内嵌) ====================
+
+        let frpcTunnelsList = [];
+        let frpcStatusInterval = null;
+
+        document.getElementById('refreshFrpcStatusBtn').addEventListener('click', refreshFrpcStatus);
+        document.getElementById('refreshLogBtn').addEventListener('click', refreshFrpcLogs);
+
+        async function refreshFrpcStatus() {
+            const result = await apiCallSilent('GET', '/api/frpc/status');
+            if (result && !result.error) {
+                const statusEl = document.getElementById('frpcRunStatus');
+                const pidEl = document.getElementById('frpcPid');
+                if (result.running) {
+                    statusEl.textContent = '运行中';
+                    statusEl.className = 'stat-value success';
+                    pidEl.textContent = result.pid || '-';
+                } else if (result.exit_code !== null && result.exit_code !== undefined) {
+                    statusEl.textContent = '已崩溃 (exit: ' + result.exit_code + ')';
+                    statusEl.className = 'stat-value';
+                    statusEl.style.color = '#ef4444';
+                    pidEl.textContent = '-';
+                    // 自动刷新日志以便用户查看错误
+                    refreshFrpcLogs();
+                } else {
+                    statusEl.textContent = '已停止';
+                    statusEl.className = 'stat-value';
+                    pidEl.textContent = '-';
+                }
+            }
+        }
+
+        async function refreshFrpcLogs() {
+            const result = await apiCallSilent('GET', '/api/frpc/logs');
+            const logArea = document.getElementById('frpcLogArea');
+            if (result && !result.error) {
+                if (result.logs) {
+                    logArea.textContent = result.logs;
+                    logArea.scrollTop = logArea.scrollHeight;
+                } else {
+                    logArea.textContent = '暂无日志';
+                }
+            } else {
+                logArea.textContent = '获取日志失败：' + (result?.error || '未知错误');
+            }
+        }
+
+        function getSelectedFrpcTunnelIds() {
+            const checkboxes = document.querySelectorAll('.frpc-tunnel-checkbox:checked');
+            return Array.from(checkboxes).map(cb => parseInt(cb.value));
+        }
+
+        document.getElementById('startFrpcBtn').addEventListener('click', async () => {
+            const proxyIds = getSelectedFrpcTunnelIds();
+
+            if (proxyIds.length === 0) {
+                showNotification('请先在隧道列表中勾选要启动的隧道', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('startFrpcBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 生成配置...';
+            btn.disabled = true;
+
+            const configResult = await apiCallSilent('POST', '/api/frpc/generate_config', { proxyIds });
+
+            if (configResult && configResult.error) {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                // 显示详细错误信息
+                let errMsg = '生成配置失败：' + configResult.error;
+                if (configResult.error.includes('未登录')) errMsg = '登录已过期，请重新登录';
+                else if (configResult.error.includes('所有隧道')) errMsg = '所有隧道配置获取失败，请检查隧道是否已正确创建';
+                else if (configResult.error.includes('配置')) errMsg = '配置文件生成异常: ' + configResult.error;
+                showNotification(errMsg, 'error');
+                return;
+            }
+
+            // 检查是否有警告
+            if (configResult && configResult.warning) {
+                console.warn('[配置] 警告:', configResult.warning);
+            }
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 启动 FRPC...';
+
+            const result = await apiCallSilent('POST', '/api/frpc/start', { proxyIds });
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+
+            if (result && !result.error) {
+                showNotification(`FRPC 启动成功！PID: ${result.pid}，共 ${result.tunnel_count} 个隧道`, 'success');
+                refreshFrpcStatus();
+                setTimeout(refreshFrpcLogs, 1000);
+                setTimeout(refreshFrpcLogs, 3000); // 3秒后再刷新一次，查看启动日志
+                if (frpcStatusInterval) clearInterval(frpcStatusInterval);
+                frpcStatusInterval = setInterval(() => {
+                    refreshFrpcStatus();
+                    refreshFrpcLogs();
+                }, 5000);
+            } else {
+                let errMsg = result?.error || '未知错误';
+                if (errMsg.includes('未登录')) errMsg = '登录已过期，请重新登录';
+                else if (errMsg.includes('配置文件不存在')) errMsg = '配置文件缺失，请先勾选隧道并点击启动';
+                else if (errMsg.includes('客户端程序') || errMsg.includes('mefrpc')) errMsg = 'FRPC 客户端不存在，请先下载';
+                showNotification('启动失败：' + errMsg, 'error');
+                // 自动刷新日志看看有没有错误信息
+                refreshFrpcLogs();
+            }
+        });
+
+        document.getElementById('stopFrpcBtn').addEventListener('click', async () => {
+            if (!confirm('确定要停止 FRPC 客户端吗？')) return;
+
+            const btn = document.getElementById('stopFrpcBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 停止中...';
+            btn.disabled = true;
+
+            const result = await apiCallSilent('POST', '/api/frpc/stop');
+            
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+
+            if (result && !result.error) {
+                showNotification('FRPC 已停止', 'success');
+                refreshFrpcStatus();
+                if (frpcStatusInterval) {
+                    clearInterval(frpcStatusInterval);
+                    frpcStatusInterval = null;
+                }
+            } else {
+                showNotification('停止失败：' + (result?.error || '未知错误'), 'error');
+            }
+        });
+
+        document.getElementById('downloadClientBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('downloadClientBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 检查中...';
+            btn.disabled = true;
+
+            const check = await apiCallSilent('GET', '/api/frpc/check_client');
+            
+            if (check && check.exists) {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                showNotification('客户端已存在: ' + check.path, 'success');
+                return;
+            }
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 下载中...';
+            
+            const result = await apiCallSilent('POST', '/api/frpc/download', {});
+            
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+
+            if (result && !result.error) {
+                showNotification('客户端下载成功！', 'success');
+            } else {
+                showNotification('下载失败：' + (result?.error || '未知错误'), 'error');
+            }
+        });
+
         checkLoginStatus();
     </script>
+</div><!-- /#appBody -->
 </body>
 </html>
