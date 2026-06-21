@@ -35,3 +35,7 @@ $RECYCLE.BIN/
 *.egg-info/
 dist/
 build/
+
+docs/docs.zip
+*.zip
+
