@@ -3012,6 +3012,9 @@
                             </span>
                         </td>
                         <td>
+                            <button class="btn btn-sm btn-success" onclick="startSingleTunnel(${proxy.proxyId}, '${(proxy.proxyName || '').replace(/'/g, "\\'")}')" title="启动此隧道" style="background-color:#10b981;">
+                                <i class="fas fa-play"></i>
+                            </button>
                             <button class="btn btn-sm btn-secondary" onclick="toggleTunnel(${proxy.proxyId}, ${isDisabled})" title="${isDisabled ? '启用' : '禁用'}">
                                 <i class="fas fa-${isDisabled ? 'play' : 'pause'}"></i>
                             </button>
@@ -3173,6 +3176,56 @@
             if (lbl) lbl.textContent = labelMap[nodeTrafficUnit];
             if (window.__lastNodesData) {
                 renderNodesTable(window.__lastNodesData);
+            }
+        };
+
+        // 启动单个隧道
+        window.startSingleTunnel = async function(proxyId, proxyName) {
+            const displayName = proxyName && proxyName !== 'undefined' ? proxyName : proxyId;
+            if (!confirm(`确定要启动隧道 [${displayName}] 吗？\n\n此操作将停止当前所有正在运行的 FRPC 进程，并以仅此隧道的配置重新启动。`)) {
+                return;
+            }
+
+            const proxyIds = [proxyId];
+
+            try {
+                showNotification(`正在为隧道 [${displayName}] 生成配置...`, 'info');
+                // 1) 生成该隧道的 TOML 配置
+                const cfgRes = await apiCallSilent('POST', '/api/frpc/generate_config', { proxyIds });
+                if (cfgRes && cfgRes.error) {
+                    let errMsg = cfgRes.error;
+                    if (errMsg.includes('未登录')) errMsg = '登录已过期，请重新登录';
+                    else if (errMsg.includes('配置')) errMsg = '配置生成失败: ' + errMsg;
+                    showNotification('生成配置失败：' + errMsg, 'error');
+                    return;
+                }
+
+                // 2) 启动 FRPC
+                showNotification(`正在启动 FRPC（隧道 ${displayName}）...`, 'info');
+                const startRes = await apiCallSilent('POST', '/api/frpc/start', { proxyIds });
+                if (startRes && !startRes.error) {
+                    showNotification(`隧道 [${displayName}] 启动成功！PID: ${startRes.pid}`, 'success');
+                    // 刷新状态/日志（FRPC 状态区与隧道列表在同一 section，无需切换）
+                    if (typeof refreshFrpcStatus === 'function') refreshFrpcStatus();
+                    if (typeof refreshFrpcLogs === 'function') {
+                        setTimeout(refreshFrpcLogs, 1000);
+                        setTimeout(refreshFrpcLogs, 3000);
+                    }
+                    // 滚动到日志区域，方便用户查看启动结果
+                    const logArea = document.getElementById('frpcLogArea');
+                    if (logArea && logArea.scrollIntoView) {
+                        logArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                } else {
+                    let errMsg = startRes?.error || '未知错误';
+                    if (errMsg.includes('未登录')) errMsg = '登录已过期，请重新登录';
+                    else if (errMsg.includes('配置文件不存在')) errMsg = '配置文件缺失，请稍后重试';
+                    else if (errMsg.includes('客户端程序') || errMsg.includes('mefrpc')) errMsg = 'FRPC 客户端不存在，请先下载';
+                    showNotification('启动失败：' + errMsg, 'error');
+                    if (typeof refreshFrpcLogs === 'function') refreshFrpcLogs();
+                }
+            } catch (e) {
+                showNotification('启动异常：' + (e?.message || e), 'error');
             }
         };
 
