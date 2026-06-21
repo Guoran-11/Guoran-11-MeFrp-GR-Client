@@ -38,4 +38,6 @@ build/
 
 docs/docs.zip
 *.zip
+scripts/deploy-bt.config.json
+!scripts/deploy-bt.config.example.json
 
