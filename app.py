@@ -2160,22 +2160,46 @@ def api_frpc_download():
         return jsonify({'error': f'下载失败: {str(e)}'}), 500
 
 # ------------------- 启动服务 -------------------
+def _parse_args():
+    """解析命令行参数。打包成 exe 后，PyInstaller 会把这些参数透传"""
+    import argparse
+    p = argparse.ArgumentParser(add_help=True, description='MeFrp-GR-Client 启动器')
+    p.add_argument('--host', default='0.0.0.0', help='监听地址 (默认 0.0.0.0)')
+    p.add_argument('--port', type=int, default=5001, help='监听端口 (默认 5001)')
+    p.add_argument('--open-browser', dest='open_browser', action='store_true',
+                   help='启动后自动打开浏览器（默认不打开）')
+    p.add_argument('--no-browser', dest='open_browser', action='store_false',
+                   help='不打开浏览器（默认行为）')
+    p.set_defaults(open_browser=False)
+    return p.parse_args()
+
 if __name__ == '__main__':
-    url = "http://127.0.0.1:5001"
-    print("=" * 50)
-    print("  MeFrp-GR-Client v1.0.0")
-    print("=" * 50)
-    print(f"  访问地址: {url}")
-    print("  浏览器将自动打开")
+    args = _parse_args()
+    host = args.host
+    port = args.port
+    open_browser = args.open_browser
+
+    local_url = f"http://127.0.0.1:{port}"
+    print("=" * 56)
+    print("  MeFrp-GR-Client v1.0.0  (打包运行模式)")
+    print("=" * 56)
+    print(f"  访问地址: {local_url}")
+    print(f"  局域网地址: http://<本机IP>:{port}")
+    if open_browser:
+        print("  浏览器将自动打开")
+    else:
+        print("  浏览器不会自动打开，请手动访问上方地址")
     print("  按 Ctrl+C 停止服务")
-    print("=" * 50)
-    
-    threading.Timer(1.5, lambda: webbrowser.open(url)).start()
-    
+    print("=" * 56)
+
+    # 仅当显式指定 --open-browser 时才自动打开浏览器
+    if open_browser:
+        threading.Timer(1.5, lambda: webbrowser.open(local_url)).start()
+
     try:
         from waitress import serve
         print("[服务] 使用 waitress 生产模式启动")
-        serve(app, host='0.0.0.0', port=5001)
+        serve(app, host=host, port=port)
     except ImportError:
         print("[服务] waitress 不可用，使用 Flask 调试模式")
-        app.run(debug=False, host='0.0.0.0', port=5001)
+        app.run(debug=False, host=host, port=port)

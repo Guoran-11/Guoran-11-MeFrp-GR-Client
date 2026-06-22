@@ -1,3 +1,8 @@
+# 运行时必需依赖
 Flask==2.3.3
 MEFrpLib==2.2.7
 requests==2.31.0
+waitress==3.0.0
+
+# 打包 EXE 时需要（已包含在 build_exe.bat 自动化流程中）
+pyinstaller>=6.0
