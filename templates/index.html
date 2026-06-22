@@ -961,10 +961,6 @@
                         <i class="fas fa-shield-alt" style="color:#06b6d4;"></i>
                         <span>Token 登录</span>
                     </button>
-                    <button class="login-method-btn" data-method="passkey" onclick="showLoginForm('passkey')">
-                        <i class="fas fa-fingerprint" style="color:#f59e0b;"></i>
-                        <span>通用密钥登录</span>
-                    </button>
                 </div>
 
                 <!-- Token 登录表单 -->
@@ -980,22 +976,6 @@
                     </div>
                     <button type="submit" class="btn-login-submit" id="tokenSubmitBtn">
                         <i class="fas fa-sign-in-alt"></i> 验证登录
-                    </button>
-                </form>
-
-                <!-- 通用密钥(Token)登录表单 -->
-                <form id="loginFormPasskey" style="display:none;" onsubmit="return handlePasskeyLogin(event)">
-                    <button type="button" class="back-to-methods" onclick="backToMethods()">
-                        <i class="fas fa-arrow-left"></i> 返回
-                    </button>
-                    <h3 style="color:#f1f5f9; font-size:1.1rem; font-weight:600; margin:1rem 0 1.2rem;"><i class="fas fa-fingerprint" style="color:#f59e0b; margin-right:0.5rem;"></i>通用密钥登录</h3>
-                    <div class="login-input-group">
-                        <label>访问 Token</label>
-                        <input type="password" class="login-input" id="pkToken" placeholder="输入您的访问令牌" required autocomplete="off">
-                        <small style="color:#64748b; font-size:0.75rem; margin-top:0.3rem; display:block;">Token 输入后不会明文显示</small>
-                    </div>
-                    <button type="submit" class="btn-login-submit" id="pkSubmitBtn">
-                        <i class="fas fa-fingerprint"></i> 验证并登录
                     </button>
                 </form>
 
@@ -1161,7 +1141,29 @@
                     <button class="btn btn-secondary" id="refreshTokenBtn">
                         <i class="fas fa-sync-alt"></i> 刷新 Token
                     </button>
+                    <button class="btn btn-secondary" id="openLogBtn" onclick="toggleConsole()" style="margin-left:auto;">
+                        <i class="fas fa-terminal"></i> 命令行输出
+                    </button>
+                    <button class="btn btn-danger" id="quitAppBtn" onclick="quitApp()" style="background:#ef4444; color:#fff; border:none;">
+                        <i class="fas fa-power-off"></i> 关闭程序
+                    </button>
                 </div>
+            </div>
+
+            <!-- 命令行输出（可隐藏） -->
+            <div class="card" id="consoleCard" style="display:none;">
+                <div class="card-header">
+                    <span class="card-title"><i class="fas fa-terminal"></i> 命令行输出</span>
+                    <div style="display:flex; gap:0.5rem;">
+                        <button class="btn btn-secondary" style="padding:0.3rem 0.7rem; font-size:0.8rem;" onclick="refreshConsole()">
+                            <i class="fas fa-sync-alt"></i> 刷新
+                        </button>
+                        <button class="btn btn-secondary" style="padding:0.3rem 0.7rem; font-size:0.8rem;" onclick="clearConsoleView()">
+                            <i class="fas fa-eraser"></i> 清空
+                        </button>
+                    </div>
+                </div>
+                <pre id="consoleOutput" style="background:#0c1022; color:#94a3b8; padding:0.9rem 1.1rem; border-radius:8px; max-height:340px; overflow-y:auto; font-family:'Cascadia Code','Consolas',monospace; font-size:0.78rem; line-height:1.55; margin:0;"></pre>
             </div>
 
             <!-- 签到区域 -->
@@ -1997,18 +1999,16 @@
             document.getElementById('loginLoadingOverlay').style.display = 'none';
         }
 
-        // 切换到具体登录表单
+        // 切换到具体登录表单（只保留 Token 登录）
         function showLoginForm(method) {
             document.getElementById('loginMethodSelect').style.display = 'none';
-            document.getElementById('loginFormToken').style.display = method === 'token' ? 'block' : 'none';
-            document.getElementById('loginFormPasskey').style.display = method === 'passkey' ? 'block' : 'none';
+            document.getElementById('loginFormToken').style.display = 'block';
         }
 
-        // 返回方式选择
+        // 返回方式选择（保留兼容，实际只显示 Token）
         function backToMethods() {
             document.getElementById('loginMethodSelect').style.display = 'flex';
             document.getElementById('loginFormToken').style.display = 'none';
-            document.getElementById('loginFormPasskey').style.display = 'none';
         }
 
         // Token 登录
@@ -2035,32 +2035,6 @@
                 showNotification('网络错误: ' + err.message, 'error');
             } finally {
                 btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 验证登录';
-                hideLoginLoading();
-            }
-        }
-
-        // 通用密钥(Token)登录
-        async function handlePasskeyLogin(e) {
-            e.preventDefault();
-            const token = document.getElementById('pkToken').value.trim();
-            if (!token) return;
-
-            const btn = document.getElementById('pkSubmitBtn');
-            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 验证中...';
-            showLoginLoading('正在验证访问令牌...');
-
-            try {
-                const result = await apiCallSilent('POST', '/api/token_login', { token });
-                // 兼容多种响应格式
-                if (result && (result.code === 200 || result.token || result.message?.includes('成功'))) {
-                    onLoginSuccess(result);
-                } else {
-                    showNotification(result?.error || 'Token 无效或已过期', 'error');
-                }
-            } catch (err) {
-                showNotification('网络错误: ' + err.message, 'error');
-            } finally {
-                btn.disabled = false; btn.innerHTML = '<i class="fas fa-fingerprint"></i> 验证并登录';
                 hideLoginLoading();
             }
         }
@@ -2196,21 +2170,33 @@
             }
         }
 
-        // 复制访问密钥
-        function copyAccessKey() {
-            const token = sessionStorage.getItem('token') || localStorage.getItem('token') || '';
-            const text = token || '';
-            if (!text) {
-                showNotification('当前未找到访问密钥，请先登录', 'warning');
-                return;
-            }
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(text).then(
-                    () => showNotification('访问密钥已复制到剪贴板', 'success'),
-                    () => fallbackCopy(text)
-                );
-            } else {
-                fallbackCopy(text);
+        // 复制访问密钥（通过后端获取真实 token，避免 localStorage 读不到）
+        async function copyAccessKey() {
+            showNotification('正在获取访问密钥...', 'info');
+            try {
+                const r = await apiCallSilent('GET', '/api/user/frpToken');
+                if (!r || r.error) {
+                    showNotification(r?.error || '获取访问密钥失败，请先登录', 'error');
+                    return;
+                }
+                // 兼容多种返回结构
+                const text = r.data?.frpToken || r.data?.token || r.frpToken || r.token || '';
+                if (!text) {
+                    showNotification('访问密钥为空，请先登录', 'warning');
+                    return;
+                }
+                // 同时缓存到 sessionStorage 供后续快速读取
+                sessionStorage.setItem('token', text);
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(text).then(
+                        () => showNotification('访问密钥已复制到剪贴板', 'success'),
+                        () => fallbackCopy(text)
+                    );
+                } else {
+                    fallbackCopy(text);
+                }
+            } catch (e) {
+                showNotification('网络错误: ' + e.message, 'error');
             }
         }
         function fallbackCopy(text) {
@@ -2289,7 +2275,60 @@
                 return errorData;
             }
         }
-        
+
+        // ===========================================================
+        // 命令行输出 & 关闭程序
+        // ===========================================================
+        function toggleConsole() {
+            const card = document.getElementById('consoleCard');
+            if (card.style.display === 'none') {
+                card.style.display = '';
+                refreshConsole();
+                // 自动滚动到底部
+                setTimeout(() => {
+                    const el = document.getElementById('consoleOutput');
+                    if (el) el.scrollTop = el.scrollHeight;
+                }, 100);
+            } else {
+                card.style.display = 'none';
+            }
+        }
+
+        async function refreshConsole() {
+            const el = document.getElementById('consoleOutput');
+            if (!el) return;
+            el.textContent = '正在加载...';
+            try {
+                const r = await apiCallSilent('GET', '/api/console_log');
+                if (!r || r.error) {
+                    el.textContent = '获取日志失败: ' + (r?.error || '未知错误');
+                    return;
+                }
+                el.textContent = r.logs || '(空)';
+                el.scrollTop = el.scrollHeight;
+            } catch (e) {
+                el.textContent = '网络错误: ' + e.message;
+            }
+        }
+
+        function clearConsoleView() {
+            const el = document.getElementById('consoleOutput');
+            if (el) el.textContent = '(已清空)';
+        }
+
+        async function quitApp() {
+            if (!confirm('确定要关闭 MeFrp-GR-Client 程序吗？\n（后端 + 桌面控制台都会退出）')) return;
+            try {
+                await apiCallSilent('POST', '/api/shutdown', {});
+            } catch (e) {
+                // ignore
+            }
+            // 给后端 0.5s 关闭时间
+            setTimeout(() => {
+                document.body.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; height:100vh; color:#94a3b8; font-family:system-ui; flex-direction:column; gap:1rem;"><i class="fas fa-check-circle" style="font-size:3rem; color:#10b981;"></i><div style="font-size:1.1rem;">程序已关闭，可以关闭此窗口</div></div>';
+            }, 600);
+        }
+
         // 后台 API 调用（不显示在结果区域）
         async function apiCallSilent(method, url, body = null) {
             const options = {

@@ -8,6 +8,9 @@ MeFrp-GR-Client PyInstaller 打包配置
 打包产物：
     dist/MeFrp-GR-Client/MeFrp-GR-Client.exe
     dist/MeFrp-GR-Client/  (附带 templates / mefrp / _internal 等)
+
+默认行为：双击 .exe 弹出**原生 tkinter 桌面控制台窗口**（不打开浏览器）。
+如需纯 Web 后端模式：在命令行追加  --no-gui
 """
 
 import os
@@ -46,10 +49,24 @@ hiddenimports += collect_submodules('werkzeug')
 hiddenimports += collect_submodules('jinja2')
 hiddenimports += collect_submodules('waitress')
 hiddenimports += collect_submodules('requests')
+# 桌面 GUI（PySide6 / Qt WebEngine）相关
+hiddenimports += collect_submodules('PySide6')
+hiddenimports += collect_submodules('PySide6.QtCore')
+hiddenimports += collect_submodules('PySide6.QtGui')
+hiddenimports += collect_submodules('PySide6.QtWidgets')
+hiddenimports += collect_submodules('PySide6.QtNetwork')
+hiddenimports += collect_submodules('PySide6.QtWebEngineWidgets')
+hiddenimports += collect_submodules('PySide6.QtWebEngineCore')
+hiddenimports += collect_submodules('shiboken6')
+hiddenimports += [
+    'desktop_gui',
+    'urllib.request',
+    'urllib.parse',
+    'http.client',
+]
 
-# 不需要打包的常见大模块
+# 不需要打包的常见大模块（保留 PySide6 必需）
 excludes = [
-    'tkinter',
     'unittest',
     'pydoc',
     'doctest',
@@ -59,7 +76,6 @@ excludes = [
     'PyQt5',
     'PyQt6',
     'PySide2',
-    'PySide6',
     'IPython',
     'notebook',
     'pytest',
@@ -94,7 +110,7 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=True,            # 保留控制台窗口（要看日志）
+    console=False,           # 窗口模式：不弹黑色控制台，直接显示 Qt WebEngine 桌面控制台
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,

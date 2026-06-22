@@ -3,6 +3,8 @@ Flask==2.3.3
 MEFrpLib==2.2.7
 requests==2.31.0
 waitress==3.0.0
+# 桌面控制台（Qt 原生窗口，单文件 pip install；不依赖系统 tkinter）
+PySide6>=6.6.0
 
 # 打包 EXE 时需要（已包含在 build_exe.bat 自动化流程中）
 pyinstaller>=6.0

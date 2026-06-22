@@ -47,6 +47,16 @@ def diagnostic():
     except Exception as e:
         return f"<h1>Template file missing</h1><p>Make sure templates/diagnostic.html exists</p><pre>{e}</pre>", 500
 
+@app.route('/api/status')
+def api_status():
+    """轻量级状态端点（供桌面 GUI 心跳检测使用）"""
+    return jsonify({
+        'ok': True,
+        'app': 'MeFrp-GR-Client',
+        'version': '1.0.0',
+        'logged_in': bool(session.get('token'))
+    })
+
 # ------------------- 辅助函数 -------------------
 def get_client():
     """从 session 获取 MEFrpClient，若没有 token 但有凭据则自动重新登录"""
@@ -1898,6 +1908,82 @@ def api_frpc_logs():
     global frpc_logs
     return jsonify({'logs': frpc_logs[-200:]})
 
+
+# ==================== 控制台日志缓冲（用于 WebUI 显示命令行输出）====================
+import io as _io
+import logging as _logging
+from collections import deque as _deque
+
+_log_buffer = _deque(maxlen=2000)  # 最多保留 2000 行日志
+_log_handler_installed = False
+
+
+class _WebUILogHandler(_logging.Handler):
+    def emit(self, record):
+        try:
+            msg = self.format(record)
+            _log_buffer.append(msg)
+        except Exception:
+            pass
+
+
+def _install_log_capture():
+    """安装日志捕获（捕获到全局 _log_buffer）"""
+    global _log_handler_installed
+    if _log_handler_installed:
+        return
+    fmt = _logging.Formatter('%(asctime)s [%(levelname)s] %(message)s', datefmt='%H:%M:%S')
+    h = _WebUILogHandler()
+    h.setFormatter(fmt)
+    root = _logging.getLogger()
+    root.addHandler(h)
+    # 同时捕获 werkzeug / flask / mefrp 的日志
+    for name in ('', 'werkzeug', 'flask', 'flask.app'):
+        lg = _logging.getLogger(name)
+        lg.setLevel(_logging.INFO)
+    _log_handler_installed = True
+
+
+@app.route('/api/console_log', methods=['GET'])
+def api_console_log():
+    """供 WebUI 获取后端实时日志（命令行输出）"""
+    return jsonify({
+        'logs': '\n'.join(_log_buffer),
+        'total': len(_log_buffer),
+    })
+
+
+@app.route('/api/shutdown', methods=['POST'])
+def api_shutdown():
+    """关闭整个程序（后端 + 桌面控制台）"""
+    def _do_shutdown():
+        # 等 0.4s 让响应先返回
+        import time as _t
+        _t.sleep(0.4)
+        # 退出 GUI（如果有的话）
+        try:
+            from PySide6.QtWidgets import QApplication
+            app_inst = QApplication.instance()
+            if app_inst:
+                app_inst.quit()
+        except Exception:
+            pass
+        # 关闭 Flask（waitress / werkzeug）
+        try:
+            func = request.environ.get('werkzeug.server.shutdown')
+            if func:
+                func()
+                return
+        except Exception:
+            pass
+        # 强制结束进程
+        import os as _os
+        _os._exit(0)
+
+    import threading as _thr
+    _thr.Thread(target=_do_shutdown, daemon=True).start()
+    return jsonify({'message': '程序正在关闭...', 'ok': True})
+
 def _clean_toml_config(toml_content):
     """清理 TOML 配置，移除可能会导致 mefrpc 崩溃的 plugin 段（仅移除 plugin 字段和 plugin section，保留其他以 plugin 开头的字段）"""
     if not toml_content:
@@ -2170,36 +2256,101 @@ def _parse_args():
                    help='启动后自动打开浏览器（默认不打开）')
     p.add_argument('--no-browser', dest='open_browser', action='store_false',
                    help='不打开浏览器（默认行为）')
-    p.set_defaults(open_browser=False)
+    p.add_argument('--no-gui', dest='no_gui', action='store_true',
+                   help='不启动桌面 GUI（仅跑后端 Web 服务）')
+    p.add_argument('--web-only', dest='no_gui', action='store_true',
+                   help='同 --no-gui')
+    p.set_defaults(open_browser=False, no_gui=False)
     return p.parse_args()
+
+
+def _start_backend_in_thread(host, port):
+    """在后台线程启动 Flask / waitress，不阻塞 GUI"""
+    def _run():
+        try:
+            # 安装日志捕获（供 WebUI 显示命令行输出）
+            try:
+                _install_log_capture()
+            except Exception:
+                pass
+            from waitress import serve
+            print(f"[后端] 监听 {host}:{port} (waitress)")
+            serve(app, host=host, port=port)
+        except ImportError:
+            print("[后端] waitress 不可用，回退到 Flask 内置服务器")
+            app.run(debug=False, host=host, port=port, use_reloader=False)
+        except Exception as e:
+            traceback.print_exc()
+    t = threading.Thread(target=_run, daemon=True, name='FlaskBackend')
+    t.start()
+    # 等待后端就绪
+    import time
+    import urllib.request
+    for _ in range(50):
+        time.sleep(0.1)
+        try:
+            urllib.request.urlopen(f"http://127.0.0.1:{port}/", timeout=0.5).read()
+            return True
+        except Exception:
+            continue
+    return False
+
 
 if __name__ == '__main__':
     args = _parse_args()
     host = args.host
     port = args.port
     open_browser = args.open_browser
+    no_gui = args.no_gui
 
     local_url = f"http://127.0.0.1:{port}"
+
+    # 情况 1: --no-gui / --web-only  → 仅启动 Web 后端（保持旧行为）
+    if no_gui:
+        print("=" * 56)
+        print("  MeFrp-GR-Client v1.0.0  (Web 后端模式)")
+        print("=" * 56)
+        print(f"  访问地址: {local_url}")
+        print("  按 Ctrl+C 停止服务")
+        print("=" * 56)
+        if open_browser:
+            threading.Timer(1.5, lambda: webbrowser.open(local_url)).start()
+        try:
+            from waitress import serve
+            print("[服务] 使用 waitress 生产模式启动")
+            serve(app, host=host, port=port)
+        except ImportError:
+            print("[服务] waitress 不可用，使用 Flask 调试模式")
+            app.run(debug=False, host=host, port=port)
+        sys.exit(0)
+
+    # 情况 2: 默认 → 启动桌面 GUI（Qt WebEngine 原生窗口嵌入 WebUI 1:1 复刻）
     print("=" * 56)
-    print("  MeFrp-GR-Client v1.0.0  (打包运行模式)")
+    print("  MeFrp-GR-Client v1.0.0  (桌面控制台模式 - WebUI 1:1 嵌入)")
     print("=" * 56)
-    print(f"  访问地址: {local_url}")
-    print(f"  局域网地址: http://<本机IP>:{port}")
-    if open_browser:
-        print("  浏览器将自动打开")
-    else:
-        print("  浏览器不会自动打开，请手动访问上方地址")
-    print("  按 Ctrl+C 停止服务")
+    print(f"  后端 API: {local_url}")
+    print("  正在启动 Web 后端 + 桌面控制台...")
     print("=" * 56)
 
-    # 仅当显式指定 --open-browser 时才自动打开浏览器
-    if open_browser:
-        threading.Timer(1.5, lambda: webbrowser.open(local_url)).start()
+    if not _start_backend_in_thread(host, port):
+        print("[警告] 后端启动超时，仍继续打开 GUI（请检查端口占用）")
 
+    # 启动桌面 GUI（确保 desktop_gui 在导入路径上，兼容便携版 Python 各种启动方式）
     try:
-        from waitress import serve
-        print("[服务] 使用 waitress 生产模式启动")
-        serve(app, host=host, port=port)
-    except ImportError:
-        print("[服务] waitress 不可用，使用 Flask 调试模式")
-        app.run(debug=False, host=host, port=port)
+        import os, sys as _sys
+        _script_dir = os.path.dirname(os.path.abspath(__file__))
+        if _script_dir not in _sys.path:
+            _sys.path.insert(0, _script_dir)
+        from desktop_gui import run_gui
+    except Exception as e:
+        traceback.print_exc()
+        print(f"[致命错误] 无法加载桌面 GUI 模块: {e}")
+        print("回退到纯 Web 模式...")
+        try:
+            from waitress import serve
+            serve(app, host=host, port=port)
+        except ImportError:
+            app.run(debug=False, host=host, port=port)
+        sys.exit(1)
+
+    run_gui(api_base=local_url)

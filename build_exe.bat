@@ -12,10 +12,15 @@ echo   本脚本会：
 echo     1) 检查 Python 环境
 echo     2) 安装 PyInstaller 与依赖
 echo     3) 调用 build.spec 生成 dist\MeFrp-GR-Client\
-echo     4) 启动 .exe 试运行
 echo.
-echo   默认配置：仅打包，不自动打开浏览器
-echo   如需打开浏览器：双击运行后追加 --open-browser
+echo   默认配置：双击 .exe 弹出 **原生 tkinter 桌面控制台窗口**
+echo             （不打开浏览器，不需要任何浏览器引擎）
+echo.
+echo   命令行参数（双击运行时直接透传）：
+echo     --no-gui / --web-only   仅启动 Web 后端（不弹 GUI）
+echo     --open-browser          启动后自动打开浏览器
+echo     --port 8080             修改端口
+echo     --help                  查看所有参数
 echo.
 echo ===============================================================
 echo.
@@ -85,11 +90,12 @@ echo [4/4] 打包完成！
 echo.
 echo ===============================================================
 echo   产物位置：%EXE_PATH%
-echo   运行方式：双击启动后，浏览器地址栏访问 http://127.0.0.1:5001
-echo   命令行参数：
-echo             --open-browser   启动后自动打开浏览器
-echo             --port 8080      修改端口
-echo             --help           查看所有参数
+echo.
+echo   双击运行：弹出原生桌面控制台窗口
+echo   命令行可选参数：
+echo             --no-gui / --web-only   改为仅启动 Web 后端
+echo             --open-browser          同时打开浏览器
+echo             --port 8080             修改端口
 echo ===============================================================
 echo.
 

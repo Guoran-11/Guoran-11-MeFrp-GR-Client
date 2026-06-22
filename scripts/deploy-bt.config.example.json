@@ -1,8 +1,0 @@
-{
-  "_comment": "MeFrp-GR-Client 宝塔部署配置示例。复制为 deploy-bt.config.json 后修改实际值。",
-  "domain": "mefrp.example.com",
-  "server": "root@1.2.3.4",
-  "sshKey": "C:/Users/YourName/.ssh/id_rsa",
-  "btPanel": "https://1.2.3.4:8888",
-  "btKey": "your_bt_panel_api_key_here"
-}
